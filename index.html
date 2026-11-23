@@ -23,8 +23,6 @@
 
     #asciiCanvas {
       display: block;
-      width: 100vw;
-      height: 100vh;
     }
   </style>
 </head>
@@ -41,34 +39,29 @@
     const srcCanvas = document.createElement("canvas");
     const srcCtx = srcCanvas.getContext("2d", { willReadFrequently: true });
 
-    let angleY = 0.2;
+    let angleY = 0.25;
     let time = 0;
 
-    // Szeroka, gęsta kompozycja bukietu lilii rozkładająca się na boki i do góry,
-    // z wyraźnym wazonem u dołu (wzorowana na układzie z drugiego zdjęcia)
+    // Gęsty, rozłożysty bukiet lilii orientalnych (15 kwiatów + pąki + liście + prążkowany wazon)
     const FLOWERS = [
-      // Duże kwiaty na pierwszym planie i po bokach
-      { x: -58, y: 18, z: 34, rx: -0.22, ry: -0.55, rz: 0.25, scale: 1.32, phase: 0.0 },
-      { x: 54,  y: 22, z: 32, rx: -0.25, ry: 0.55,  rz: -0.22, scale: 1.34, phase: 0.9 },
-      { x: -12, y: 4,  z: 46, rx: -0.15, ry: -0.12, rz: 0.08, scale: 1.28, phase: 1.7 },
-      { x: 18,  y: -14, z: 48, rx: -0.10, ry: 0.22, rz: -0.14, scale: 1.25, phase: 2.4 },
+      { x: -58, y: 18, z: 36, rx: -0.22, ry: -0.55, rz: 0.25, scale: 1.38, phase: 0.0 },
+      { x: 54,  y: 22, z: 34, rx: -0.25, ry: 0.55,  rz: -0.22, scale: 1.40, phase: 0.9 },
+      { x: -12, y: 4,  z: 48, rx: -0.15, ry: -0.12, rz: 0.08, scale: 1.34, phase: 1.7 },
+      { x: 18,  y: -14, z: 50, rx: -0.10, ry: 0.22, rz: -0.14, scale: 1.30, phase: 2.4 },
 
-      // Środkowa warstwa bukietu
-      { x: -82, y: 36, z: 4,  rx: -0.32, ry: -1.05, rz: 0.30, scale: 1.22, phase: 3.1 },
-      { x: 80,  y: 38, z: 2,  rx: -0.30, ry: 1.05,  rz: -0.28, scale: 1.22, phase: 3.8 },
-      { x: -28, y: 42, z: 18, rx: -0.38, ry: -0.28, rz: 0.14, scale: 1.24, phase: 4.5 },
-      { x: 26,  y: 45, z: 16, rx: -0.40, ry: 0.30,  rz: -0.14, scale: 1.24, phase: 5.2 },
+      { x: -82, y: 36, z: 4,  rx: -0.32, ry: -1.05, rz: 0.30, scale: 1.28, phase: 3.1 },
+      { x: 80,  y: 38, z: 2,  rx: -0.30, ry: 1.05,  rz: -0.28, scale: 1.28, phase: 3.8 },
+      { x: -28, y: 42, z: 18, rx: -0.38, ry: -0.28, rz: 0.14, scale: 1.30, phase: 4.5 },
+      { x: 26,  y: 45, z: 16, rx: -0.40, ry: 0.30,  rz: -0.14, scale: 1.30, phase: 5.2 },
 
-      // Górna część bukietu
-      { x: -46, y: 68, z: -12, rx: -0.52, ry: -0.65, rz: 0.22, scale: 1.15, phase: 0.5 },
-      { x: 44,  y: 70, z: -10, rx: -0.50, ry: 0.65,  rz: -0.20, scale: 1.15, phase: 1.3 },
-      { x: -4,  y: 76, z: -6,  rx: -0.62, ry: 0.08,  rz: 0.04, scale: 1.18, phase: 2.1 },
+      { x: -46, y: 68, z: -12, rx: -0.52, ry: -0.65, rz: 0.22, scale: 1.22, phase: 0.5 },
+      { x: 44,  y: 70, z: -10, rx: -0.50, ry: 0.65,  rz: -0.20, scale: 1.22, phase: 1.3 },
+      { x: -4,  y: 76, z: -6,  rx: -0.62, ry: 0.08,  rz: 0.04, scale: 1.24, phase: 2.1 },
 
-      // Tylna strona bukietu (aby obrót 360° był pełny)
-      { x: -56, y: 28, z: -36, rx: -0.25, ry: -2.25, rz: 0.20, scale: 1.24, phase: 2.9 },
-      { x: 56,  y: 30, z: -36, rx: -0.25, ry: 2.25,  rz: -0.20, scale: 1.24, phase: 3.6 },
-      { x: 0,   y: 40, z: -46, rx: -0.35, ry: 3.14,  rz: 0.0,  scale: 1.26, phase: 4.3 },
-      { x: 0,   y: 12, z: -42, rx: -0.18, ry: 3.14,  rz: 0.0,  scale: 1.22, phase: 5.0 }
+      { x: -56, y: 28, z: -38, rx: -0.25, ry: -2.25, rz: 0.20, scale: 1.30, phase: 2.9 },
+      { x: 56,  y: 30, z: -38, rx: -0.25, ry: 2.25,  rz: -0.20, scale: 1.30, phase: 3.6 },
+      { x: 0,   y: 40, z: -48, rx: -0.35, ry: 3.14,  rz: 0.0,  scale: 1.32, phase: 4.3 },
+      { x: 0,   y: 12, z: -44, rx: -0.18, ry: 3.14,  rz: 0.0,  scale: 1.28, phase: 5.0 }
     ];
 
     const BUDS = [
@@ -85,8 +78,8 @@
         y: -26 + (i % 4) * 14,
         z: Math.sin(a) * r,
         yaw: a,
-        len: 46 + (i % 3) * 14,
-        wid: 11 + (i % 2) * 3,
+        len: 48 + (i % 3) * 14,
+        wid: 12 + (i % 2) * 3,
         phase: i * 0.55
       };
     });
@@ -145,4 +138,376 @@
 
       if (d !== 0) {
         if (max === rn) h = ((gn - bn) / d + (gn < bn ? 6 : 0)) / 6;
-        else if (max === gn
+        else if (max === gn) h = ((bn - rn) / d + 2) / 6;
+        else h = ((rn - gn) / d + 4) / 6;
+      }
+
+      const sNew = Math.min(1, s * sat);
+      const i = Math.floor(h * 6);
+      const f = h * 6 - i;
+      const p = v * (1 - sNew);
+      const q = v * (1 - f * sNew);
+      const t = v * (1 - (1 - f) * sNew);
+
+      let ro = v, go = v, bo = v;
+      switch (i % 6) {
+        case 0: ro = v; go = t; bo = p; break;
+        case 1: ro = q; go = v; bo = p; break;
+        case 2: ro = p; go = v; bo = t; break;
+        case 3: ro = p; go = q; bo = v; break;
+        case 4: ro = t; go = p; bo = v; break;
+        case 5: ro = v; go = p; bo = q; break;
+      }
+      return [Math.round(ro * 255), Math.round(go * 255), Math.round(bo * 255)];
+    }
+
+    function renderBouquet(width, height) {
+      srcCanvas.width = width;
+      srcCanvas.height = height;
+
+      srcCtx.fillStyle = "#030305";
+      srcCtx.fillRect(0, 0, width, height);
+
+      const cx = width * 0.5;
+      const cy = height * 0.56;
+      const scale = Math.min(width / 235, height / 235);
+      const items = [];
+
+      // Prążkowany szklany wazon u dołu
+      const vaseTopY = -38;
+      const vaseBotY = -112;
+      const radTop = 34;
+      const radBot = 28;
+      const ribs = 28;
+
+      for (let i = 0; i < ribs; i++) {
+        const a1 = (i / ribs) * Math.PI * 2;
+        const a2 = ((i + 0.75) / ribs) * Math.PI * 2;
+
+        const t1 = project3D(Math.cos(a1) * radTop, vaseTopY, Math.sin(a1) * radTop, angleY, cx, cy, scale);
+        const t2 = project3D(Math.cos(a2) * radTop, vaseTopY, Math.sin(a2) * radTop, angleY, cx, cy, scale);
+        const b2 = project3D(Math.cos(a2) * radBot, vaseBotY, Math.sin(a2) * radBot, angleY, cx, cy, scale);
+        const b1 = project3D(Math.cos(a1) * radBot, vaseBotY, Math.sin(a1) * radBot, angleY, cx, cy, scale);
+
+        const avgZ = (t1.z + t2.z + b1.z + b2.z) * 0.25;
+        items.push({
+          z: avgZ + (avgZ < 0 ? 6 : 36),
+          draw: () => {
+            srcCtx.beginPath();
+            srcCtx.moveTo(t1.x, t1.y);
+            srcCtx.lineTo(t2.x, t2.y);
+            srcCtx.lineTo(b2.x, b2.y);
+            srcCtx.lineTo(b1.x, b1.y);
+            srcCtx.closePath();
+
+            const spec = Math.abs(Math.sin(a1 + angleY));
+            srcCtx.fillStyle = avgZ < 0
+              ? `rgba(165, 200, 185, ${0.32 + spec * 0.34})`
+              : "rgba(95, 125, 115, 0.18)";
+            srcCtx.fill();
+
+            srcCtx.strokeStyle = avgZ < 0
+              ? `rgba(225, 248, 240, ${0.45 + spec * 0.45})`
+              : "rgba(110, 140, 130, 0.25)";
+            srcCtx.lineWidth = Math.max(1.2, 1.4 * t1.p);
+            srcCtx.stroke();
+          }
+        });
+      }
+
+      // Łodygi
+      FLOWERS.forEach((fl) => {
+        const pTop = project3D(fl.x, fl.y - 4, fl.z, angleY, cx, cy, scale);
+        const pMid = project3D(fl.x * 0.25, -24, fl.z * 0.25, angleY, cx, cy, scale);
+        const pBot = project3D(fl.x * 0.16, -102, fl.z * 0.16, angleY, cx, cy, scale);
+
+        items.push({
+          z: (pTop.z + pMid.z + pBot.z) / 3 + 14,
+          draw: () => {
+            srcCtx.beginPath();
+            srcCtx.moveTo(pBot.x, pBot.y);
+            srcCtx.quadraticCurveTo(pMid.x, pMid.y, pTop.x, pTop.y);
+            srcCtx.strokeStyle = "#325b2c";
+            srcCtx.lineWidth = Math.max(2.2, 3.8 * pMid.p);
+            srcCtx.stroke();
+          }
+        });
+      });
+
+      // Zielone liście
+      LEAVES.forEach((lf) => {
+        const yaw = lf.yaw + Math.sin(time * 1.4 + lf.phase) * 0.04;
+        const pBase = project3D(lf.x, lf.y, lf.z, angleY, cx, cy, scale);
+        const tx = lf.x + Math.cos(yaw) * lf.len;
+        const ty = lf.y + 8;
+        const tz = lf.z + Math.sin(yaw) * lf.len;
+        const pTip = project3D(tx, ty, tz, angleY, cx, cy, scale);
+
+        const px = -Math.sin(yaw) * lf.wid;
+        const pz = Math.cos(yaw) * lf.wid;
+        const mx = (lf.x + tx) * 0.5;
+        const my = (lf.y + ty) * 0.5 + 8;
+        const mz = (lf.z + tz) * 0.5;
+
+        const pL = project3D(mx + px, my, mz + pz, angleY, cx, cy, scale);
+        const pR = project3D(mx - px, my, mz - pz, angleY, cx, cy, scale);
+
+        items.push({
+          z: (pBase.z + pTip.z + pL.z + pR.z) * 0.25,
+          draw: () => {
+            srcCtx.beginPath();
+            srcCtx.moveTo(pBase.x, pBase.y);
+            srcCtx.quadraticCurveTo(pL.x, pL.y, pTip.x, pTip.y);
+            srcCtx.quadraticCurveTo(pR.x, pR.y, pBase.x, pBase.y);
+            srcCtx.closePath();
+
+            const grad = srcCtx.createLinearGradient(pBase.x, pBase.y, pTip.x, pTip.y);
+            grad.addColorStop(0, "#1d3b1b");
+            grad.addColorStop(0.6, "#315b2b");
+            grad.addColorStop(1, "#45783d");
+            srcCtx.fillStyle = grad;
+            srcCtx.fill();
+          }
+        });
+      });
+
+      // Pąki u góry
+      BUDS.forEach((bud) => {
+        const sway = Math.sin(time * 1.4 + bud.phase) * 2.5;
+        const pBase = project3D(bud.x, bud.y - 12, bud.z, angleY, cx, cy, scale);
+        const pTip = project3D(bud.tipX + sway, bud.tipY, bud.tipZ, angleY, cx, cy, scale);
+        const pL = project3D(bud.x - 6, bud.y + 4, bud.z + 3, angleY, cx, cy, scale);
+        const pR = project3D(bud.x + 8, bud.y + 4, bud.z - 3, angleY, cx, cy, scale);
+
+        items.push({
+          z: pTip.z,
+          draw: () => {
+            srcCtx.beginPath();
+            srcCtx.moveTo(pBase.x, pBase.y);
+            srcCtx.quadraticCurveTo(pL.x, pL.y, pTip.x, pTip.y);
+            srcCtx.quadraticCurveTo(pR.x, pR.y, pBase.x, pBase.y);
+            srcCtx.closePath();
+
+            const grad = srcCtx.createLinearGradient(pBase.x, pBase.y, pTip.x, pTip.y);
+            grad.addColorStop(0, "#75944c");
+            grad.addColorStop(0.45, "#f9e0e8");
+            grad.addColorStop(1, "#f4acc3");
+            srcCtx.fillStyle = grad;
+            srcCtx.fill();
+          }
+        });
+      });
+
+      // Kwiaty lilii orientalnych
+      FLOWERS.forEach((fl) => {
+        const sway = Math.sin(time * 1.4 + fl.phase) * 0.03;
+        const centerW = localToWorld(0, 0, 0, fl);
+        const pCenter = project3D(centerW.x, centerW.y, centerW.z, angleY + sway, cx, cy, scale);
+
+        for (let p = 0; p < 6; p++) {
+          const theta = (p / 6) * Math.PI * 2 + (p % 2) * 0.05;
+          const len = p % 2 === 0 ? 33 : 30;
+          const wid = p % 2 === 0 ? 12.5 : 14.0;
+          const curl = -8.5;
+
+          const cosT = Math.cos(theta);
+          const sinT = Math.sin(theta);
+
+          const wBase = localToWorld(cosT * 2.5, sinT * 2.5, 1, fl);
+          const wMidL = localToWorld(
+            cosT * (len * 0.52) - sinT * wid,
+            sinT * (len * 0.52) + cosT * wid,
+            4.5,
+            fl
+          );
+          const wMidR = localToWorld(
+            cosT * (len * 0.52) + sinT * wid,
+            sinT * (len * 0.52) - cosT * wid,
+            4.5,
+            fl
+          );
+          const wTip = localToWorld(cosT * len, sinT * len, curl, fl);
+          const wStripe = localToWorld(cosT * (len * 0.75), sinT * (len * 0.75), -1.5, fl);
+
+          const pBase = project3D(wBase.x, wBase.y, wBase.z, angleY + sway, cx, cy, scale);
+          const pMidL = project3D(wMidL.x, wMidL.y, wMidL.z, angleY + sway, cx, cy, scale);
+          const pMidR = project3D(wMidR.x, wMidR.y, wMidR.z, angleY + sway, cx, cy, scale);
+          const pTip = project3D(wTip.x, wTip.y, wTip.z, angleY + sway, cx, cy, scale);
+          const pStripe = project3D(wStripe.x, wStripe.y, wStripe.z, angleY + sway, cx, cy, scale);
+
+          const zAvg = (pBase.z + pMidL.z + pMidR.z + pTip.z) * 0.25;
+
+          items.push({
+            z: zAvg,
+            draw: () => {
+              srcCtx.beginPath();
+              srcCtx.moveTo(pBase.x, pBase.y);
+              srcCtx.quadraticCurveTo(pMidL.x, pMidL.y, pTip.x, pTip.y);
+              srcCtx.quadraticCurveTo(pMidR.x, pMidR.y, pBase.x, pBase.y);
+              srcCtx.closePath();
+
+              const grad = srcCtx.createLinearGradient(pBase.x, pBase.y, pTip.x, pTip.y);
+              grad.addColorStop(0.0, "#c2ce70");
+              grad.addColorStop(0.18, "#dc3870");
+              grad.addColorStop(0.62, "#f782aa");
+              grad.addColorStop(0.88, "#ffe0eb");
+              grad.addColorStop(1.0, "#fff7fa");
+
+              srcCtx.fillStyle = grad;
+              srcCtx.fill();
+
+              srcCtx.strokeStyle = "rgba(255, 238, 245, 0.85)";
+              srcCtx.lineWidth = Math.max(1.0, 1.3 * pBase.p);
+              srcCtx.stroke();
+
+              srcCtx.beginPath();
+              srcCtx.moveTo(pBase.x, pBase.y);
+              srcCtx.lineTo(pStripe.x, pStripe.y);
+              srcCtx.strokeStyle = "rgba(184, 24, 78, 0.85)";
+              srcCtx.lineWidth = Math.max(1.4, 2.2 * pBase.p);
+              srcCtx.stroke();
+
+              for (let s = 1; s <= 4; s++) {
+                const t = s * 0.14;
+                const sx = pBase.x + (pStripe.x - pBase.x) * t;
+                const sy = pBase.y + (pStripe.y - pBase.y) * t;
+                const off = (s % 2 === 0 ? 1 : -1) * 2.0 * pBase.p;
+                srcCtx.fillStyle = "#6d0d2e";
+                srcCtx.fillRect(sx + off, sy - off * 0.5, 1.6 * pBase.p, 1.6 * pBase.p);
+              }
+            }
+          });
+        }
+
+        for (let st = 0; st < 6; st++) {
+          const a = (st / 6) * Math.PI * 2 + 0.3;
+          const wAnther = localToWorld(Math.cos(a) * 10, Math.sin(a) * 10, 15, fl);
+          const pAnther = project3D(wAnther.x, wAnther.y, wAnther.z, angleY + sway, cx, cy, scale);
+
+          items.push({
+            z: pAnther.z - 2,
+            draw: () => {
+              srcCtx.beginPath();
+              srcCtx.moveTo(pCenter.x, pCenter.y);
+              srcCtx.lineTo(pAnther.x, pAnther.y);
+              srcCtx.strokeStyle = "#dee89e";
+              srcCtx.lineWidth = Math.max(1.0, 1.3 * pCenter.p);
+              srcCtx.stroke();
+
+              srcCtx.fillStyle = "#591818";
+              srcCtx.beginPath();
+              srcCtx.ellipse(
+                pAnther.x,
+                pAnther.y,
+                Math.max(1.8, 3.0 * pAnther.p),
+                Math.max(1.1, 1.5 * pAnther.p),
+                a,
+                0,
+                Math.PI * 2
+              );
+              srcCtx.fill();
+            }
+          });
+        }
+      });
+
+      items.sort((a, b) => b.z - a.z);
+      for (let i = 0; i < items.length; i++) {
+        items[i].draw();
+      }
+    }
+
+    function drawFrame() {
+      const vw = Math.max(300, window.innerWidth || document.documentElement.clientWidth || 800);
+      const vh = Math.max(300, window.innerHeight || document.documentElement.clientHeight || 600);
+
+      // Dopasowanie siatki znaków tak, aby cały bukiet mieścił się idealnie na ekranie
+      const targetCols = Math.min(130, Math.max(70, Math.floor(vw / 7)));
+      const cellW = Math.max(4, Math.floor(vw / targetCols));
+      const cellH = Math.max(7, Math.round(cellW / 0.54));
+      const cols = Math.floor(vw / cellW);
+      const rows = Math.floor(vh / cellH);
+
+      renderBouquet(cols, rows);
+      const data = srcCtx.getImageData(0, 0, cols, rows).data;
+
+      const count = cols * rows;
+      const rArr = new Uint8Array(count);
+      const gArr = new Uint8Array(count);
+      const bArr = new Uint8Array(count);
+      const lum = new Float32Array(count);
+
+      for (let i = 0; i < count; i++) {
+        const p = i * 4;
+        const [r, g, b] = boostSaturation(data[p], data[p + 1], data[p + 2], 1.35);
+        rArr[i] = r;
+        gArr[i] = g;
+        bArr[i] = b;
+        lum[i] = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0;
+      }
+
+      const outW = cols * cellW;
+      const outH = rows * cellH;
+      if (asciiCanvas.width !== outW || asciiCanvas.height !== outH) {
+        asciiCanvas.width = outW;
+        asciiCanvas.height = outH;
+      }
+
+      asciiCtx.fillStyle = "#040406";
+      asciiCtx.fillRect(0, 0, outW, outH);
+
+      asciiCtx.font = `bold ${cellH}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
+      asciiCtx.textBaseline = "top";
+
+      const edgeThresh = 0.8 - 0.6 * 0.55;
+      const rampLen = RAMP.length;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const idx = r * cols + c;
+          const l = lum[idx];
+          if (l < 0.06) continue;
+
+          let glyph = RAMP[Math.min(rampLen - 1, Math.round(l * (rampLen - 1)))];
+
+          if (r > 0 && r < rows - 1 && c > 0 && c < cols - 1) {
+            const tl = lum[(r - 1) * cols + (c - 1)];
+            const tc = lum[(r - 1) * cols + c];
+            const tr = lum[(r - 1) * cols + (c + 1)];
+            const ml = lum[r * cols + (c - 1)];
+            const mr = lum[r * cols + (c + 1)];
+            const bl = lum[(r + 1) * cols + (c - 1)];
+            const bc = lum[(r + 1) * cols + c];
+            const br = lum[(r + 1) * cols + (c + 1)];
+
+            const gx = -tl + tr - 2 * ml + 2 * mr - bl + br;
+            const gy = -tl - 2 * tc - tr + bl + 2 * bc + br;
+            const mag = Math.hypot(gx, gy) / 4.0;
+
+            if (mag > edgeThresh && l > 0.12) {
+              const ang = ((Math.atan2(gy, gx) * 180) / Math.PI + 90.0 + 360.0) % 180.0;
+              glyph = EDGE_GLYPHS[Math.floor(((ang + 22.5) % 180.0) / 45.0)];
+            }
+          }
+
+          asciiCtx.fillStyle = `rgb(${rArr[idx]},${gArr[idx]},${bArr[idx]})`;
+          asciiCtx.fillText(glyph, c * cellW, r * cellH);
+        }
+      }
+    }
+
+    let prev = performance.now();
+    function loop(now) {
+      const dt = Math.min(0.1, (now - prev) / 1000);
+      prev = now;
+      time += dt;
+      angleY += dt * 0.65;
+      drawFrame();
+      requestAnimationFrame(loop);
+    }
+
+    drawFrame();
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
