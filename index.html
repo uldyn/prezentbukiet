@@ -30,7 +30,8 @@
   <canvas id="asciiCanvas"></canvas>
 
   <script>
-    const RAMP = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+    // Rampa dobrane pod czysty, wyraźny rysunek bez nadmiaru drobnych nawiasów
+    const RAMP = " .:-=+*oa#MW8&%B@$";
     const EDGE_GLYPHS = ["-", "\\", "|", "/"];
 
     const asciiCanvas = document.getElementById("asciiCanvas");
@@ -42,50 +43,43 @@
     let angleY = 0.2;
     let time = 0;
 
-    // Układ kwiatów wzorowany na bukiecie lilii ze zdjęcia:
-    // rozłożyste kwiaty po bokach, w środku i u góry + pąki i liście nad wazonem
+    // 11 wyraźnie rozstawionych kwiatów lilii orientalnych (pełny obrót 360°)
     const FLOWERS = [
-      // Duże kwiaty z przodu i po bokach
-      { x: -68, y: 10,  z: 34,  rx: -0.25, ry: -0.45, rz: 0.22,  scale: 1.32, phase: 0.0 },
-      { x: 66,  y: 14,  z: 32,  rx: -0.25, ry: 0.45,  rz: -0.20, scale: 1.34, phase: 0.8 },
-      { x: -16, y: -6,  z: 46,  rx: -0.18, ry: -0.12, rz: 0.08,  scale: 1.26, phase: 1.6 },
-      { x: 22,  y: -18, z: 44,  rx: -0.15, ry: 0.22,  rz: -0.12, scale: 1.22, phase: 2.3 },
+      { x: -66, y: 12,  z: 36,  rx: -0.24, ry: -0.45, rz: 0.22,  scale: 1.32, phase: 0.0 },
+      { x: 64,  y: 16,  z: 34,  rx: -0.24, ry: 0.45,  rz: -0.20, scale: 1.34, phase: 0.9 },
+      { x: 0,   y: -6,  z: 48,  rx: -0.18, ry: 0.05,  rz: 0.04,  scale: 1.28, phase: 1.8 },
 
-      // Środkowa warstwa kwiatów
-      { x: -88, y: 34,  z: 4,   rx: -0.35, ry: -0.90, rz: 0.28,  scale: 1.24, phase: 3.0 },
-      { x: 86,  y: 36,  z: 2,   rx: -0.35, ry: 0.90,  rz: -0.26, scale: 1.24, phase: 3.7 },
-      { x: -30, y: 40,  z: 18,  rx: -0.42, ry: -0.25, rz: 0.12,  scale: 1.26, phase: 4.4 },
-      { x: 30,  y: 42,  z: 16,  rx: -0.42, ry: 0.25,  rz: -0.12, scale: 1.26, phase: 5.1 },
+      { x: -86, y: 38,  z: 4,   rx: -0.34, ry: -0.92, rz: 0.26,  scale: 1.24, phase: 2.7 },
+      { x: 84,  y: 40,  z: 2,   rx: -0.34, ry: 0.92,  rz: -0.24, scale: 1.24, phase: 3.6 },
+      { x: -34, y: 46,  z: 18,  rx: -0.40, ry: -0.25, rz: 0.12,  scale: 1.24, phase: 4.5 },
+      { x: 34,  y: 48,  z: 16,  rx: -0.40, ry: 0.25,  rz: -0.12, scale: 1.24, phase: 5.4 },
 
-      // Górna część bukietu
-      { x: -48, y: 66,  z: -10, rx: -0.55, ry: -0.55, rz: 0.18,  scale: 1.18, phase: 0.4 },
-      { x: 48,  y: 68,  z: -8,  rx: -0.55, ry: 0.55,  rz: -0.18, scale: 1.18, phase: 1.2 },
-      { x: 0,   y: 74,  z: -4,  rx: -0.65, ry: 0.05,  rz: 0.02,  scale: 1.20, phase: 2.0 },
+      { x: -46, y: 72,  z: -10, rx: -0.52, ry: -0.50, rz: 0.16,  scale: 1.16, phase: 0.6 },
+      { x: 46,  y: 74,  z: -8,  rx: -0.52, ry: 0.50,  rz: -0.16, scale: 1.16, phase: 1.5 },
+      { x: 0,   y: 78,  z: -4,  rx: -0.62, ry: 0.0,   rz: 0.0,   scale: 1.18, phase: 2.4 },
 
-      // Pełny obrót 360° — kwiaty z tyłu
-      { x: -64, y: 24,  z: -36, rx: -0.28, ry: -2.20, rz: 0.18,  scale: 1.26, phase: 2.8 },
-      { x: 64,  y: 26,  z: -36, rx: -0.28, ry: 2.20,  rz: -0.18, scale: 1.26, phase: 3.5 },
-      { x: 0,   y: 38,  z: -46, rx: -0.38, ry: 3.14,  rz: 0.0,   scale: 1.28, phase: 4.2 },
-      { x: 0,   y: 8,   z: -42, rx: -0.20, ry: 3.14,  rz: 0.0,   scale: 1.22, phase: 4.9 }
+      // Tył bukietu
+      { x: -58, y: 26,  z: -38, rx: -0.28, ry: -2.25, rz: 0.18,  scale: 1.24, phase: 3.3 },
+      { x: 58,  y: 28,  z: -38, rx: -0.28, ry: 2.25,  rz: -0.18, scale: 1.24, phase: 4.2 },
+      { x: 0,   y: 34,  z: -46, rx: -0.34, ry: 3.14,  rz: 0.0,   scale: 1.26, phase: 5.1 }
     ];
 
     const BUDS = [
-      { x: 24,  y: 92, z: -6,  tipX: 30,  tipY: 116, tipZ: -4,  phase: 0.4 },
-      { x: -32, y: 84, z: -12, tipX: -40, tipY: 106, tipZ: -10, phase: 1.8 },
-      { x: 6,   y: 90, z: 8,   tipX: 8,   tipY: 112, tipZ: 12,  phase: 3.2 }
+      { x: 24,  y: 96, z: -6,  tipX: 30,  tipY: 118, tipZ: -4,  phase: 0.4 },
+      { x: -30, y: 90, z: -12, tipX: -38, tipY: 110, tipZ: -10, phase: 1.8 }
     ];
 
-    const LEAVES = Array.from({ length: 18 }, (_, i) => {
-      const a = (i / 18) * Math.PI * 2;
-      const r = 22 + (i % 3) * 11;
+    const LEAVES = Array.from({ length: 14 }, (_, i) => {
+      const a = (i / 14) * Math.PI * 2;
+      const r = 22 + (i % 2) * 10;
       return {
         x: Math.cos(a) * r,
         y: -30 + (i % 3) * 14,
         z: Math.sin(a) * r,
         yaw: a,
-        len: 48 + (i % 2) * 12,
-        wid: 10 + (i % 2) * 2,
-        phase: i * 0.55
+        len: 46 + (i % 2) * 12,
+        wid: 9 + (i % 2) * 2,
+        phase: i * 0.6
       };
     });
 
@@ -176,15 +170,15 @@
       const charAspect = cellH / cellW;
       const cx = cols * 0.5;
       const cy = rows * 0.55;
-      const scale = Math.min((cols / charAspect) / 275, rows / 245);
+      const scale = Math.min((cols / charAspect) / 280, rows / 248);
       const items = [];
 
-      // Prążkowany wazon rozszerzający się lekko ku górze (jak na zdjęciu lilii)
+      // Prążkowany wazon u dołu
       const vaseTopY = -44;
       const vaseBotY = -112;
-      const radTop = 36;
+      const radTop = 35;
       const radBot = 24;
-      const ribs = 22;
+      const ribs = 20;
 
       for (let i = 0; i < ribs; i++) {
         const a1 = (i / ribs) * Math.PI * 2;
@@ -202,7 +196,7 @@
           z: avgZ + 8,
           draw: () => {
             const spec = Math.abs(Math.sin(a1 + angleY));
-            srcCtx.fillStyle = `rgba(140, 175, 162, ${0.22 + spec * 0.25})`;
+            srcCtx.fillStyle = `rgba(145, 180, 168, ${0.22 + spec * 0.25})`;
             srcCtx.beginPath();
             srcCtx.moveTo(t1.x, t1.y);
             srcCtx.lineTo(t2.x, t2.y);
@@ -211,7 +205,7 @@
             srcCtx.closePath();
             srcCtx.fill();
 
-            srcCtx.strokeStyle = `rgba(220, 245, 235, ${0.42 + spec * 0.48})`;
+            srcCtx.strokeStyle = `rgba(220, 245, 236, ${0.45 + spec * 0.45})`;
             srcCtx.lineWidth = Math.max(1.0, 1.3 * t1.p);
             srcCtx.beginPath();
             srcCtx.moveTo(t1.x, t1.y);
@@ -234,7 +228,7 @@
             srcCtx.moveTo(pBot.x, pBot.y);
             srcCtx.quadraticCurveTo(pMid.x, pMid.y, pTop.x, pTop.y);
             srcCtx.strokeStyle = "#3a6b32";
-            srcCtx.lineWidth = Math.max(1.4, 2.2 * pMid.p);
+            srcCtx.lineWidth = Math.max(1.3, 2.0 * pMid.p);
             srcCtx.stroke();
           }
         });
@@ -267,9 +261,9 @@
             srcCtx.quadraticCurveTo(pR.x, pR.y, pBase.x, pBase.y);
             srcCtx.closePath();
 
-            srcCtx.fillStyle = "#2d5926";
+            srcCtx.fillStyle = "#2b5424";
             srcCtx.fill();
-            srcCtx.strokeStyle = "#48803c";
+            srcCtx.strokeStyle = "#457a3a";
             srcCtx.lineWidth = Math.max(1.0, 1.2 * pBase.p);
             srcCtx.stroke();
           }
@@ -303,22 +297,22 @@
         });
       });
 
-      // Kwiaty lilii: jasne różowo-białe płatki dające gęstsze znaki ASCII i wyraźny kształt kwiatu
+      // Kwiaty lilii: 6 smukłych, wyraźnie odciętych płatków z jasnym brzegiem i różowym środkiem
       FLOWERS.forEach((fl) => {
         const sway = Math.sin(time * 1.3 + fl.phase) * 0.025;
         const centerW = localToWorld(0, 0, 0, fl);
         const pCenter = project3D(centerW.x, centerW.y, centerW.z, angleY + sway, cx, cy, scale, charAspect);
 
         for (let p = 0; p < 6; p++) {
-          const theta = (p / 6) * Math.PI * 2 + (p % 2) * 0.05;
-          const len = p % 2 === 0 ? 32 : 29;
-          const wid = p % 2 === 0 ? 11.5 : 12.5;
-          const curl = -8.0;
+          const theta = (p / 6) * Math.PI * 2 + (p % 2) * 0.06;
+          const len = p % 2 === 0 ? 33 : 30;
+          const wid = p % 2 === 0 ? 10.5 : 11.5;
+          const curl = -8.5;
 
           const cosT = Math.cos(theta);
           const sinT = Math.sin(theta);
 
-          const wBase = localToWorld(cosT * 2.5, sinT * 2.5, 1, fl);
+          const wBase = localToWorld(cosT * 3.0, sinT * 3.0, 1, fl);
           const wMidL = localToWorld(
             cosT * (len * 0.52) - sinT * wid,
             sinT * (len * 0.52) + cosT * wid,
@@ -361,15 +355,15 @@
               srcCtx.fillStyle = grad;
               srcCtx.fill();
 
-              srcCtx.strokeStyle = "#8a1640";
-              srcCtx.lineWidth = Math.max(0.9, 1.2 * pBase.p);
+              srcCtx.strokeStyle = "#7d1238";
+              srcCtx.lineWidth = Math.max(1.0, 1.3 * pBase.p);
               srcCtx.stroke();
 
               srcCtx.beginPath();
               srcCtx.moveTo(pBase.x, pBase.y);
               srcCtx.lineTo(pStripe.x, pStripe.y);
               srcCtx.strokeStyle = "#b81d53";
-              srcCtx.lineWidth = Math.max(1.0, 1.6 * pBase.p);
+              srcCtx.lineWidth = Math.max(1.0, 1.5 * pBase.p);
               srcCtx.stroke();
             }
           });
@@ -417,8 +411,7 @@
       const vw = Math.max(300, window.innerWidth || document.documentElement.clientWidth || 800);
       const vh = Math.max(300, window.innerHeight || document.documentElement.clientHeight || 600);
 
-      // Gęstsza siatka znaków dla lepszego kształtu płatków i detali
-      const targetCols = Math.min(165, Math.max(95, Math.floor(vw / 7)));
+      const targetCols = Math.min(155, Math.max(95, Math.floor(vw / 7.5)));
       const cellW = Math.max(4, Math.floor(vw / targetCols));
       const cellH = Math.max(7, Math.round(cellW / 0.55));
       const cols = Math.floor(vw / cellW);
