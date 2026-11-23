@@ -42,8 +42,6 @@
     let angleY = 0.25;
     let time = 0;
 
-    // 9 dobrze rozstawionych kwiatów lilii (przód, boki, góra i tył),
-    // żeby każdy kwiat miał czytelne 6 płatków i nie zlewał się z sąsiednim
     const FLOWERS = [
       { x: -68, y: 14,  z: 36,  rx: -0.22, ry: -0.45, rz: 0.20,  scale: 1.42, phase: 0.0 },
       { x: 66,  y: 18,  z: 34,  rx: -0.22, ry: 0.45,  rz: -0.18, scale: 1.44, phase: 0.9 },
@@ -53,9 +51,8 @@
       { x: 42,  y: 52,  z: 12,  rx: -0.36, ry: 0.35,  rz: -0.14, scale: 1.32, phase: 3.6 },
       { x: 0,   y: 78,  z: -4,  rx: -0.55, ry: 0.04,  rz: 0.02,  scale: 1.28, phase: 4.5 },
 
-      // Tył do pełnego obrotu 360°
       { x: -62, y: 24,  z: -36, rx: -0.24, ry: -2.25, rz: 0.18,  scale: 1.34, phase: 5.4 },
-      { x: 62,  y: 26,  z: -36, rx: -0.24, ry: 2.25,  rz: -0.18, scale: 1.34, phase 0.5 },
+      { x: 62,  y: 26,  z: -36, rx: -0.24, ry: 2.25,  rz: -0.18, scale: 1.34, phase: 0.5 },
       { x: 0,   y: 36,  z: -46, rx: -0.32, ry: 3.14,  rz: 0.0,   scale: 1.36, phase: 1.4 }
     ];
 
@@ -78,6 +75,10 @@
       };
     });
 
+    function isFinitePt(pt) {
+      return pt && Number.isFinite(pt.x) && Number.isFinite(pt.y) && Number.isFinite(pt.z) && Number.isFinite(pt.p);
+    }
+
     function project3D(x, y, z, rotY, cx, cy, scale, charAspect) {
       const cosY = Math.cos(rotY);
       const sinY = Math.sin(rotY);
@@ -90,8 +91,8 @@
       const y2 = y * cosX - z1 * sinX;
       const z2 = y * sinX + z1 * cosX;
 
-      const fov = 440;
-      const p = (fov / (fov + z2 + 130)) * scale;
+      const denom = Math.max(80, 440 + z2 + 130);
+      const p = (440 / denom) * scale;
 
       return {
         x: cx + x1 * p * charAspect,
@@ -119,6 +120,22 @@
         y: fl.y + y * fl.scale,
         z: fl.z + z2 * fl.scale
       };
+    }
+
+    function makePetalGrad(ctx, p1, p2) {
+      if (
+        Number.isFinite(p1.x) && Number.isFinite(p1.y) &&
+        Number.isFinite(p2.x) && Number.isFinite(p2.y) &&
+        Math.hypot(p2.x - p1.x, p2.y - p1.y) > 0.25
+      ) {
+        const g = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+        g.addColorStop(0.0, "#d4356c");
+        g.addColorStop(0.35, "#ff7aa8");
+        g.addColorStop(0.75, "#ffe0ec");
+        g.addColorStop(1.0, "#ffffff");
+        return g;
+      }
+      return "#ff8db4";
     }
 
     function boostSaturation(r, g, b, sat) {
@@ -184,6 +201,7 @@
         const b2 = project3D(Math.cos(a2) * radBot, vaseBotY, Math.sin(a2) * radBot, angleY, cx, cy, scale, charAspect);
         const b1 = project3D(Math.cos(a1) * radBot, vaseBotY, Math.sin(a1) * radBot, angleY, cx, cy, scale, charAspect);
 
+        if (!isFinitePt(t1) || !isFinitePt(t2) || !isFinitePt(b1) || !isFinitePt(b2)) continue;
         const avgZ = (t1.z + t2.z + b1.z + b2.z) * 0.25;
         if (avgZ >= 0) continue;
 
@@ -215,6 +233,7 @@
         const pTop = project3D(fl.x, fl.y - 4, fl.z, angleY, cx, cy, scale, charAspect);
         const pMid = project3D(fl.x * 0.24, -26, fl.z * 0.24, angleY, cx, cy, scale, charAspect);
         const pBot = project3D(fl.x * 0.14, -102, fl.z * 0.14, angleY, cx, cy, scale, charAspect);
+        if (!isFinitePt(pTop) || !isFinitePt(pMid) || !isFinitePt(pBot)) return;
 
         items.push({
           z: (pTop.z + pMid.z + pBot.z) / 3 + 16,
@@ -246,6 +265,7 @@
 
         const pL = project3D(mx + px, my, mz + pz, angleY, cx, cy, scale, charAspect);
         const pR = project3D(mx - px, my, mz - pz, angleY, cx, cy, scale, charAspect);
+        if (!isFinitePt(pBase) || !isFinitePt(pTip) || !isFinitePt(pL) || !isFinitePt(pR)) return;
 
         items.push({
           z: (pBase.z + pTip.z + pL.z + pR.z) * 0.25,
@@ -272,6 +292,7 @@
         const pTip = project3D(bud.tipX + sway, bud.tipY, bud.tipZ, angleY, cx, cy, scale, charAspect);
         const pL = project3D(bud.x - 5, bud.y + 4, bud.z + 3, angleY, cx, cy, scale, charAspect);
         const pR = project3D(bud.x + 7, bud.y + 4, bud.z - 3, angleY, cx, cy, scale, charAspect);
+        if (!isFinitePt(pBase) || !isFinitePt(pTip) || !isFinitePt(pL) || !isFinitePt(pR)) return;
 
         items.push({
           z: pTip.z,
@@ -281,25 +302,19 @@
             srcCtx.quadraticCurveTo(pL.x, pL.y, pTip.x, pTip.y);
             srcCtx.quadraticCurveTo(pR.x, pR.y, pBase.x, pBase.y);
             srcCtx.closePath();
-
-            const grad = srcCtx.createLinearGradient(pBase.x, pBase.y, pTip.x, pTip.y);
-            grad.addColorStop(0, "#759946");
-            grad.addColorStop(0.45, "#f7a8c2");
-            grad.addColorStop(1, "#ffffff");
-            srcCtx.fillStyle = grad;
+            srcCtx.fillStyle = "#f9b5cc";
             srcCtx.fill();
           }
         });
       });
 
-      // Wyraziste kwiaty lilii: każdy ma 6 wyraźnych płatków z jasnym brzegiem,
-      // różowym środkiem i ciemnym rozdzieleniem między płatkami
+      // Wyraźne kwiaty lilii: 6 płatków z jasnym brzegiem, różowym środkiem i ciemnym obrysem
       FLOWERS.forEach((fl) => {
         const sway = Math.sin(time * 1.3 + fl.phase) * 0.025;
         const centerW = localToWorld(0, 0, 0, fl);
         const pCenter = project3D(centerW.x, centerW.y, centerW.z, angleY + sway, cx, cy, scale, charAspect);
+        if (!isFinitePt(pCenter)) return;
 
-        // Ciemny środek kielicha, żeby płatki i pręciki były na nim świetnie widoczne
         items.push({
           z: pCenter.z + 1.5,
           draw: () => {
@@ -319,7 +334,6 @@
         });
 
         for (let p = 0; p < 6; p++) {
-          // Lekki odstęp kątowy między płatkami, żeby nie zlewały się w jeden krąg
           const theta = (p / 6) * Math.PI * 2 + (p % 2) * 0.08;
           const len = p % 2 === 0 ? 34 : 31;
           const wid = p % 2 === 0 ? 9.5 : 10.5;
@@ -350,6 +364,7 @@
           const pTip = project3D(wTip.x, wTip.y, wTip.z, angleY + sway, cx, cy, scale, charAspect);
           const pStripe = project3D(wStripe.x, wStripe.y, wStripe.z, angleY + sway, cx, cy, scale, charAspect);
 
+          if (!isFinitePt(pBase) || !isFinitePt(pMidL) || !isFinitePt(pMidR) || !isFinitePt(pTip)) continue;
           const zAvg = (pBase.z + pMidL.z + pMidR.z + pTip.z) * 0.25;
 
           items.push({
@@ -361,37 +376,30 @@
               srcCtx.quadraticCurveTo(pMidR.x, pMidR.y, pBase.x, pBase.y);
               srcCtx.closePath();
 
-              // Bardzo wyraźny gradient: intensywny róż w środku płatka + jasny, niemal biały brzeg
-              const grad = srcCtx.createLinearGradient(pBase.x, pBase.y, pTip.x, pTip.y);
-              grad.addColorStop(0.0, "#d4356c");
-              grad.addColorStop(0.35, "#ff7aa8");
-              grad.addColorStop(0.75, "#ffe0ec");
-              grad.addColorStop(1.0, "#ffffff");
-
-              srcCtx.fillStyle = grad;
+              srcCtx.fillStyle = makePetalGrad(srcCtx, pBase, pTip);
               srcCtx.fill();
 
-              // Ciemny kontur płatka oddzielający go od sąsiednich płatków
               srcCtx.strokeStyle = "#590b26";
               srcCtx.lineWidth = Math.max(1.1, 1.5 * pBase.p);
               srcCtx.stroke();
 
-              // Wyrazista środkowa żyłka płatka
-              srcCtx.beginPath();
-              srcCtx.moveTo(pBase.x, pBase.y);
-              srcCtx.lineTo(pStripe.x, pStripe.y);
-              srcCtx.strokeStyle = "#b5194f";
-              srcCtx.lineWidth = Math.max(1.1, 1.6 * pBase.p);
-              srcCtx.stroke();
+              if (isFinitePt(pStripe)) {
+                srcCtx.beginPath();
+                srcCtx.moveTo(pBase.x, pBase.y);
+                srcCtx.lineTo(pStripe.x, pStripe.y);
+                srcCtx.strokeStyle = "#b5194f";
+                srcCtx.lineWidth = Math.max(1.1, 1.6 * pBase.p);
+                srcCtx.stroke();
+              }
             }
           });
         }
 
-        // 6 pręcików z pylnikami
         for (let st = 0; st < 6; st++) {
           const a = (st / 6) * Math.PI * 2 + 0.3;
           const wAnther = localToWorld(Math.cos(a) * 11, Math.sin(a) * 11, 15, fl);
           const pAnther = project3D(wAnther.x, wAnther.y, wAnther.z, angleY + sway, cx, cy, scale, charAspect);
+          if (!isFinitePt(pAnther)) continue;
 
           items.push({
             z: pAnther.z - 2,
@@ -506,11 +514,15 @@
 
     let prev = performance.now();
     function loop(now) {
-      const dt = Math.min(0.1, (now - prev) / 1000);
-      prev = now;
-      time += dt;
-      angleY += dt * 0.55;
-      drawFrame();
+      try {
+        const dt = Math.min(0.1, (now - prev) / 1000);
+        prev = now;
+        time += dt;
+        angleY += dt * 0.55;
+        drawFrame();
+      } catch (e) {
+        // Zapewnia ciągłość pętli nawet przy chwilowej nietypowej wartości
+      }
       requestAnimationFrame(loop);
     }
 
