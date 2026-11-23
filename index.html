@@ -42,50 +42,48 @@
     let angleY = 0.25;
     let time = 0;
 
-    // Szeroki, rozłożysty bukiet lilii orientalnych wzorowany na kompozycji ze zdjęcia
+    // Rozstawione tak, aby poszczególne kwiaty miały oddech i nie zlewały się w jedną plamę
     const FLOWERS = [
-      { x: -64, y: 14, z: 36, rx: -0.22, ry: -0.55, rz: 0.25, scale: 1.38, phase: 0.0 },
-      { x: 60,  y: 18, z: 34, rx: -0.25, ry: 0.55,  rz: -0.22, scale: 1.40, phase: 0.9 },
-      { x: -14, y: 2,  z: 48, rx: -0.15, ry: -0.12, rz: 0.08, scale: 1.34, phase: 1.7 },
-      { x: 20,  y: -16, z: 50, rx: -0.10, ry: 0.22, rz: -0.14, scale: 1.30, phase: 2.4 },
+      { x: -72, y: 12,  z: 42,  rx: -0.22, ry: -0.58, rz: 0.24,  scale: 1.24, phase: 0.0 },
+      { x: 68,  y: 16,  z: 40,  rx: -0.25, ry: 0.58,  rz: -0.22, scale: 1.26, phase: 0.9 },
+      { x: -16, y: -4,  z: 56,  rx: -0.14, ry: -0.10, rz: 0.06,  scale: 1.18, phase: 1.7 },
+      { x: 24,  y: -18, z: 54,  rx: -0.10, ry: 0.24,  rz: -0.14, scale: 1.16, phase: 2.4 },
 
-      { x: -90, y: 34, z: 4,  rx: -0.32, ry: -1.05, rz: 0.30, scale: 1.28, phase: 3.1 },
-      { x: 88,  y: 36, z: 2,  rx: -0.30, ry: 1.05,  rz: -0.28, scale: 1.28, phase: 3.8 },
-      { x: -30, y: 40, z: 18, rx: -0.38, ry: -0.28, rz: 0.14, scale: 1.30, phase: 4.5 },
-      { x: 28,  y: 43, z: 16, rx: -0.40, ry: 0.30,  rz: -0.14, scale: 1.30, phase: 5.2 },
+      { x: -98, y: 38,  z: 6,   rx: -0.32, ry: -1.05, rz: 0.28,  scale: 1.16, phase: 3.1 },
+      { x: 96,  y: 40,  z: 4,   rx: -0.30, ry: 1.05,  rz: -0.26, scale: 1.16, phase: 3.8 },
+      { x: -34, y: 46,  z: 22,  rx: -0.38, ry: -0.26, rz: 0.12,  scale: 1.18, phase: 4.5 },
+      { x: 34,  y: 48,  z: 20,  rx: -0.40, ry: 0.28,  rz: -0.12, scale: 1.18, phase: 5.2 },
 
-      { x: -50, y: 66, z: -12, rx: -0.52, ry: -0.65, rz: 0.22, scale: 1.22, phase: 0.5 },
-      { x: 48,  y: 68, z: -10, rx: -0.50, ry: 0.65,  rz: -0.20, scale: 1.22, phase: 1.3 },
-      { x: -4,  y: 74, z: -6,  rx: -0.62, ry: 0.08,  rz: 0.04, scale: 1.24, phase: 2.1 },
+      { x: -54, y: 76,  z: -10, rx: -0.52, ry: -0.62, rz: 0.20,  scale: 1.10, phase: 0.5 },
+      { x: 52,  y: 78,  z: -8,  rx: -0.50, ry: 0.62,  rz: -0.18, scale: 1.10, phase: 1.3 },
+      { x: 0,   y: 84,  z: -4,  rx: -0.62, ry: 0.05,  rz: 0.02,  scale: 1.12, phase: 2.1 },
 
-      { x: -62, y: 26, z: -38, rx: -0.25, ry: -2.25, rz: 0.20, scale: 1.30, phase: 2.9 },
-      { x: 62,  y: 28, z: -38, rx: -0.25, ry: 2.25,  rz: -0.20, scale: 1.30, phase: 3.6 },
-      { x: 0,   y: 38, z: -48, rx: -0.35, ry: 3.14,  rz: 0.0,  scale: 1.32, phase: 4.3 },
-      { x: 0,   y: 10, z: -44, rx: -0.18, ry: 3.14,  rz: 0.0,  scale: 1.28, phase: 5.0 }
+      { x: -68, y: 26,  z: -42, rx: -0.25, ry: -2.25, rz: 0.18,  scale: 1.18, phase: 2.9 },
+      { x: 68,  y: 28,  z: -42, rx: -0.25, ry: 2.25,  rz: -0.18, scale: 1.18, phase: 3.6 },
+      { x: 0,   y: 40,  z: -52, rx: -0.35, ry: 3.14,  rz: 0.0,   scale: 1.20, phase: 4.3 },
+      { x: 0,   y: 8,   z: -48, rx: -0.18, ry: 3.14,  rz: 0.0,   scale: 1.16, phase: 5.0 }
     ];
 
     const BUDS = [
-      { x: 24,  y: 92, z: -8,  tipX: 30,  tipY: 116, tipZ: -6,  phase: 0.4 },
-      { x: -34, y: 84, z: -14, tipX: -42, tipY: 106, tipZ: -12, phase: 1.8 },
-      { x: 6,   y: 90, z: 10,  tipX: 8,   tipY: 112, tipZ: 14,  phase: 3.2 }
+      { x: 26,  y: 102, z: -8,  tipX: 32,  tipY: 124, tipZ: -6,  phase: 0.4 },
+      { x: -36, y: 94,  z: -14, tipX: -44, tipY: 114, tipZ: -12, phase: 1.8 },
+      { x: 6,   y: 100, z: 10,  tipX: 8,   tipY: 120, tipZ: 14,  phase: 3.2 }
     ];
 
-    const LEAVES = Array.from({ length: 24 }, (_, i) => {
-      const a = (i / 24) * Math.PI * 2;
-      const r = 20 + (i % 3) * 10;
+    const LEAVES = Array.from({ length: 16 }, (_, i) => {
+      const a = (i / 16) * Math.PI * 2;
+      const r = 24 + (i % 2) * 12;
       return {
         x: Math.cos(a) * r,
-        y: -26 + (i % 4) * 14,
+        y: -30 + (i % 3) * 14,
         z: Math.sin(a) * r,
         yaw: a,
-        len: 52 + (i % 3) * 14,
-        wid: 13 + (i % 2) * 3,
-        phase: i * 0.55
+        len: 44 + (i % 2) * 12,
+        wid: 9 + (i % 2) * 2,
+        phase: i * 0.6
       };
     });
 
-    // Rzutowanie 3D z uwzględnieniem proporcji komórek znaków (charAspect),
-    // aby obraz po rozciągnięciu na znaki terminala nie był spłaszczony
     function project3D(x, y, z, rotY, cx, cy, scale, charAspect) {
       const cosY = Math.cos(rotY);
       const sinY = Math.sin(rotY);
@@ -173,19 +171,19 @@
       const charAspect = cellH / cellW;
       const cx = cols * 0.5;
       const cy = rows * 0.56;
-      const scale = Math.min((cols / charAspect) / 265, rows / 245);
+      const scale = Math.min((cols / charAspect) / 285, rows / 255);
       const items = [];
 
-      // Prążkowany szklany wazon u dołu
-      const vaseTopY = -38;
-      const vaseBotY = -112;
+      // Prążkowany wazon u dołu z wyraźnymi przerwami między żebrami
+      const vaseTopY = -44;
+      const vaseBotY = -114;
       const radTop = 34;
       const radBot = 28;
-      const ribs = 28;
+      const ribs = 18;
 
       for (let i = 0; i < ribs; i++) {
         const a1 = (i / ribs) * Math.PI * 2;
-        const a2 = ((i + 0.75) / ribs) * Math.PI * 2;
+        const a2 = ((i + 0.45) / ribs) * Math.PI * 2;
 
         const t1 = project3D(Math.cos(a1) * radTop, vaseTopY, Math.sin(a1) * radTop, angleY, cx, cy, scale, charAspect);
         const t2 = project3D(Math.cos(a2) * radTop, vaseTopY, Math.sin(a2) * radTop, angleY, cx, cy, scale, charAspect);
@@ -196,60 +194,50 @@
         items.push({
           z: avgZ + (avgZ < 0 ? 6 : 36),
           draw: () => {
+            if (avgZ >= 0) return; // Tylna ścianka nie zasłania przednich żeber
+            const spec = Math.abs(Math.sin(a1 + angleY));
+            srcCtx.strokeStyle = `rgba(185, 225, 210, ${0.35 + spec * 0.55})`;
+            srcCtx.lineWidth = Math.max(1.0, 1.3 * t1.p);
             srcCtx.beginPath();
             srcCtx.moveTo(t1.x, t1.y);
-            srcCtx.lineTo(t2.x, t2.y);
-            srcCtx.lineTo(b2.x, b2.y);
             srcCtx.lineTo(b1.x, b1.y);
-            srcCtx.closePath();
-
-            const spec = Math.abs(Math.sin(a1 + angleY));
-            srcCtx.fillStyle = avgZ < 0
-              ? `rgba(165, 200, 185, ${0.32 + spec * 0.34})`
-              : "rgba(95, 125, 115, 0.18)";
-            srcCtx.fill();
-
-            srcCtx.strokeStyle = avgZ < 0
-              ? `rgba(225, 248, 240, ${0.45 + spec * 0.45})`
-              : "rgba(110, 140, 130, 0.25)";
-            srcCtx.lineWidth = Math.max(1.2, 1.4 * t1.p);
             srcCtx.stroke();
           }
         });
       }
 
-      // Łodygi
+      // Cienkie, ciemniejsze łodygi oddzielone od kwiatów i wazonu
       FLOWERS.forEach((fl) => {
         const pTop = project3D(fl.x, fl.y - 4, fl.z, angleY, cx, cy, scale, charAspect);
-        const pMid = project3D(fl.x * 0.25, -24, fl.z * 0.25, angleY, cx, cy, scale, charAspect);
-        const pBot = project3D(fl.x * 0.16, -102, fl.z * 0.16, angleY, cx, cy, scale, charAspect);
+        const pMid = project3D(fl.x * 0.22, -26, fl.z * 0.22, angleY, cx, cy, scale, charAspect);
+        const pBot = project3D(fl.x * 0.14, -104, fl.z * 0.14, angleY, cx, cy, scale, charAspect);
 
         items.push({
-          z: (pTop.z + pMid.z + pBot.z) / 3 + 14,
+          z: (pTop.z + pMid.z + pBot.z) / 3 + 16,
           draw: () => {
             srcCtx.beginPath();
             srcCtx.moveTo(pBot.x, pBot.y);
             srcCtx.quadraticCurveTo(pMid.x, pMid.y, pTop.x, pTop.y);
-            srcCtx.strokeStyle = "#325b2c";
-            srcCtx.lineWidth = Math.max(2.2, 3.8 * pMid.p);
+            srcCtx.strokeStyle = "#1f3d1c";
+            srcCtx.lineWidth = Math.max(1.2, 2.0 * pMid.p);
             srcCtx.stroke();
           }
         });
       });
 
-      // Zielone liście
+      // Wyraźne, smukłe liście w chłodnej zieleni
       LEAVES.forEach((lf) => {
-        const yaw = lf.yaw + Math.sin(time * 1.4 + lf.phase) * 0.04;
+        const yaw = lf.yaw + Math.sin(time * 1.3 + lf.phase) * 0.03;
         const pBase = project3D(lf.x, lf.y, lf.z, angleY, cx, cy, scale, charAspect);
         const tx = lf.x + Math.cos(yaw) * lf.len;
-        const ty = lf.y + 8;
+        const ty = lf.y + 6;
         const tz = lf.z + Math.sin(yaw) * lf.len;
         const pTip = project3D(tx, ty, tz, angleY, cx, cy, scale, charAspect);
 
         const px = -Math.sin(yaw) * lf.wid;
         const pz = Math.cos(yaw) * lf.wid;
         const mx = (lf.x + tx) * 0.5;
-        const my = (lf.y + ty) * 0.5 + 8;
+        const my = (lf.y + ty) * 0.5 + 6;
         const mz = (lf.z + tz) * 0.5;
 
         const pL = project3D(mx + px, my, mz + pz, angleY, cx, cy, scale, charAspect);
@@ -264,23 +252,22 @@
             srcCtx.quadraticCurveTo(pR.x, pR.y, pBase.x, pBase.y);
             srcCtx.closePath();
 
-            const grad = srcCtx.createLinearGradient(pBase.x, pBase.y, pTip.x, pTip.y);
-            grad.addColorStop(0, "#1d3b1b");
-            grad.addColorStop(0.6, "#315b2b");
-            grad.addColorStop(1, "#45783d");
-            srcCtx.fillStyle = grad;
+            srcCtx.fillStyle = "#1a3619";
             srcCtx.fill();
+            srcCtx.strokeStyle = "#2d592a";
+            srcCtx.lineWidth = Math.max(0.9, 1.1 * pBase.p);
+            srcCtx.stroke();
           }
         });
       });
 
       // Pąki u góry
       BUDS.forEach((bud) => {
-        const sway = Math.sin(time * 1.4 + bud.phase) * 2.5;
+        const sway = Math.sin(time * 1.3 + bud.phase) * 2.0;
         const pBase = project3D(bud.x, bud.y - 12, bud.z, angleY, cx, cy, scale, charAspect);
         const pTip = project3D(bud.tipX + sway, bud.tipY, bud.tipZ, angleY, cx, cy, scale, charAspect);
-        const pL = project3D(bud.x - 6, bud.y + 4, bud.z + 3, angleY, cx, cy, scale, charAspect);
-        const pR = project3D(bud.x + 8, bud.y + 4, bud.z - 3, angleY, cx, cy, scale, charAspect);
+        const pL = project3D(bud.x - 5, bud.y + 4, bud.z + 3, angleY, cx, cy, scale, charAspect);
+        const pR = project3D(bud.x + 7, bud.y + 4, bud.z - 3, angleY, cx, cy, scale, charAspect);
 
         items.push({
           z: pTip.z,
@@ -292,45 +279,49 @@
             srcCtx.closePath();
 
             const grad = srcCtx.createLinearGradient(pBase.x, pBase.y, pTip.x, pTip.y);
-            grad.addColorStop(0, "#75944c");
-            grad.addColorStop(0.45, "#f9e0e8");
-            grad.addColorStop(1, "#f4acc3");
+            grad.addColorStop(0, "#4c6934");
+            grad.addColorStop(0.5, "#f2b8cb");
+            grad.addColorStop(1, "#ffe3ec");
             srcCtx.fillStyle = grad;
             srcCtx.fill();
+
+            srcCtx.strokeStyle = "#8a2b4c";
+            srcCtx.lineWidth = Math.max(0.8, 1.0 * pBase.p);
+            srcCtx.stroke();
           }
         });
       });
 
-      // Kwiaty lilii orientalnych
+      // Kwiaty lilii: każdy płatek ma wyraźny kontrast i ciemniejszy kontur oddzielający go od sąsiadów
       FLOWERS.forEach((fl) => {
-        const sway = Math.sin(time * 1.4 + fl.phase) * 0.03;
+        const sway = Math.sin(time * 1.3 + fl.phase) * 0.025;
         const centerW = localToWorld(0, 0, 0, fl);
         const pCenter = project3D(centerW.x, centerW.y, centerW.z, angleY + sway, cx, cy, scale, charAspect);
 
         for (let p = 0; p < 6; p++) {
-          const theta = (p / 6) * Math.PI * 2 + (p % 2) * 0.05;
-          const len = p % 2 === 0 ? 33 : 30;
-          const wid = p % 2 === 0 ? 12.5 : 14.0;
-          const curl = -8.5;
+          const theta = (p / 6) * Math.PI * 2 + (p % 2) * 0.06;
+          const len = p % 2 === 0 ? 31 : 28;
+          const wid = p % 2 === 0 ? 10.5 : 11.5;
+          const curl = -8.0;
 
           const cosT = Math.cos(theta);
           const sinT = Math.sin(theta);
 
-          const wBase = localToWorld(cosT * 2.5, sinT * 2.5, 1, fl);
+          const wBase = localToWorld(cosT * 3.0, sinT * 3.0, 1, fl);
           const wMidL = localToWorld(
             cosT * (len * 0.52) - sinT * wid,
             sinT * (len * 0.52) + cosT * wid,
-            4.5,
+            4.0,
             fl
           );
           const wMidR = localToWorld(
             cosT * (len * 0.52) + sinT * wid,
             sinT * (len * 0.52) - cosT * wid,
-            4.5,
+            4.0,
             fl
           );
           const wTip = localToWorld(cosT * len, sinT * len, curl, fl);
-          const wStripe = localToWorld(cosT * (len * 0.75), sinT * (len * 0.75), -1.5, fl);
+          const wStripe = localToWorld(cosT * (len * 0.72), sinT * (len * 0.72), -1.0, fl);
 
           const pBase = project3D(wBase.x, wBase.y, wBase.z, angleY + sway, cx, cy, scale, charAspect);
           const pMidL = project3D(wMidL.x, wMidL.y, wMidL.z, angleY + sway, cx, cy, scale, charAspect);
@@ -350,41 +341,35 @@
               srcCtx.closePath();
 
               const grad = srcCtx.createLinearGradient(pBase.x, pBase.y, pTip.x, pTip.y);
-              grad.addColorStop(0.0, "#c2ce70");
-              grad.addColorStop(0.18, "#dc3870");
-              grad.addColorStop(0.62, "#f782aa");
-              grad.addColorStop(0.88, "#ffe0eb");
-              grad.addColorStop(1.0, "#fff7fa");
+              grad.addColorStop(0.0, "#9fb052");
+              grad.addColorStop(0.22, "#c9265e");
+              grad.addColorStop(0.65, "#f26c9a");
+              grad.addColorStop(0.92, "#ffd6e5");
+              grad.addColorStop(1.0, "#fff2f7");
 
               srcCtx.fillStyle = grad;
               srcCtx.fill();
 
-              srcCtx.strokeStyle = "rgba(255, 238, 245, 0.85)";
+              // Ciemnoróżowy kontur oddzielający każdy płatek od sąsiednich
+              srcCtx.strokeStyle = "#5c0d29";
               srcCtx.lineWidth = Math.max(1.0, 1.3 * pBase.p);
               srcCtx.stroke();
 
+              // Środkowa pręga płatka
               srcCtx.beginPath();
               srcCtx.moveTo(pBase.x, pBase.y);
               srcCtx.lineTo(pStripe.x, pStripe.y);
-              srcCtx.strokeStyle = "rgba(184, 24, 78, 0.85)";
-              srcCtx.lineWidth = Math.max(1.4, 2.2 * pBase.p);
+              srcCtx.strokeStyle = "#8f123d";
+              srcCtx.lineWidth = Math.max(1.0, 1.5 * pBase.p);
               srcCtx.stroke();
-
-              for (let s = 1; s <= 4; s++) {
-                const t = s * 0.14;
-                const sx = pBase.x + (pStripe.x - pBase.x) * t;
-                const sy = pBase.y + (pStripe.y - pBase.y) * t;
-                const off = (s % 2 === 0 ? 1 : -1) * 2.0 * pBase.p;
-                srcCtx.fillStyle = "#6d0d2e";
-                srcCtx.fillRect(sx + off, sy - off * 0.5, 1.6 * pBase.p, 1.6 * pBase.p);
-              }
             }
           });
         }
 
+        // Pręciki z ciemnymi pylnikami
         for (let st = 0; st < 6; st++) {
           const a = (st / 6) * Math.PI * 2 + 0.3;
-          const wAnther = localToWorld(Math.cos(a) * 10, Math.sin(a) * 10, 15, fl);
+          const wAnther = localToWorld(Math.cos(a) * 10, Math.sin(a) * 10, 14, fl);
           const pAnther = project3D(wAnther.x, wAnther.y, wAnther.z, angleY + sway, cx, cy, scale, charAspect);
 
           items.push({
@@ -393,17 +378,17 @@
               srcCtx.beginPath();
               srcCtx.moveTo(pCenter.x, pCenter.y);
               srcCtx.lineTo(pAnther.x, pAnther.y);
-              srcCtx.strokeStyle = "#dee89e";
-              srcCtx.lineWidth = Math.max(1.0, 1.3 * pCenter.p);
+              srcCtx.strokeStyle = "#c7d485";
+              srcCtx.lineWidth = Math.max(0.9, 1.1 * pCenter.p);
               srcCtx.stroke();
 
-              srcCtx.fillStyle = "#591818";
+              srcCtx.fillStyle = "#471111";
               srcCtx.beginPath();
               srcCtx.ellipse(
                 pAnther.x,
                 pAnther.y,
-                Math.max(1.8, 3.0 * pAnther.p * charAspect),
-                Math.max(1.1, 1.5 * pAnther.p),
+                Math.max(1.6, 2.5 * pAnther.p * charAspect),
+                Math.max(1.0, 1.3 * pAnther.p),
                 a,
                 0,
                 Math.PI * 2
@@ -424,9 +409,10 @@
       const vw = Math.max(300, window.innerWidth || document.documentElement.clientWidth || 800);
       const vh = Math.max(300, window.innerHeight || document.documentElement.clientHeight || 600);
 
-      const targetCols = Math.min(145, Math.max(75, Math.floor(vw / 7)));
-      const cellW = Math.max(4, Math.floor(vw / targetCols));
-      const cellH = Math.max(7, Math.round(cellW / 0.54));
+      // Umiarkowana liczba kolumn, aby znaki były czytelne i nie zlewały się w jednolitą masę
+      const targetCols = Math.min(105, Math.max(65, Math.floor(vw / 10)));
+      const cellW = Math.max(6, Math.floor(vw / targetCols));
+      const cellH = Math.max(10, Math.round(cellW / 0.55));
       const cols = Math.floor(vw / cellW);
       const rows = Math.floor(vh / cellH);
 
@@ -441,7 +427,7 @@
 
       for (let i = 0; i < count; i++) {
         const p = i * 4;
-        const [r, g, b] = boostSaturation(data[p], data[p + 1], data[p + 2], 1.35);
+        const [r, g, b] = boostSaturation(data[p], data[p + 1], data[p + 2], 1.25);
         rArr[i] = r;
         gArr[i] = g;
         bArr[i] = b;
@@ -461,14 +447,15 @@
       asciiCtx.font = `bold ${cellH}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
       asciiCtx.textBaseline = "top";
 
-      const edgeThresh = 0.8 - 0.6 * 0.55;
+      // Wyraźniejsza detekcja krawędzi Sobela na konturach płatków i wazonu
+      const edgeThresh = 0.8 - 0.6 * 0.72;
       const rampLen = RAMP.length;
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const idx = r * cols + c;
           const l = lum[idx];
-          if (l < 0.06) continue;
+          if (l < 0.08) continue;
 
           let glyph = RAMP[Math.min(rampLen - 1, Math.round(l * (rampLen - 1)))];
 
@@ -503,7 +490,7 @@
       const dt = Math.min(0.1, (now - prev) / 1000);
       prev = now;
       time += dt;
-      angleY += dt * 0.65;
+      angleY += dt * 0.55;
       drawFrame();
       requestAnimationFrame(loop);
     }
