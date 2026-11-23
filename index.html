@@ -30,7 +30,7 @@
   <canvas id="asciiCanvas"></canvas>
 
   <script>
-    const RAMP = " .:-=+*oa#MW8&%B@$";
+    const RAMP = " .:-=+*#%@";
     const EDGE_GLYPHS = ["-", "\\", "|", "/"];
 
     const asciiCanvas = document.getElementById("asciiCanvas");
@@ -42,35 +42,37 @@
     let angleY = 0.25;
     let time = 0;
 
+    // 7 dużych, wyraźnych kwiatów lilii w czytelnym układzie przestrzennym (360°)
     const FLOWERS = [
-      { x: -68, y: 14,  z: 36,  rx: -0.22, ry: -0.45, rz: 0.20,  scale: 1.42, phase: 0.0 },
-      { x: 66,  y: 18,  z: 34,  rx: -0.22, ry: 0.45,  rz: -0.18, scale: 1.44, phase: 0.9 },
-      { x: 0,   y: -4,  z: 48,  rx: -0.16, ry: 0.06,  rz: 0.04,  scale: 1.36, phase: 1.8 },
+      { x: -64, y: 18,  z: 34,  rx: -0.22, ry: -0.45, rz: 0.18,  scale: 1.55, phase: 0.0 },
+      { x: 64,  y: 22,  z: 32,  rx: -0.22, ry: 0.45,  rz: -0.18, scale: 1.55, phase: 0.9 },
+      { x: 0,   y: 8,   z: 44,  rx: -0.16, ry: 0.05,  rz: 0.04,  scale: 1.48, phase: 1.8 },
 
-      { x: -42, y: 50,  z: 14,  rx: -0.36, ry: -0.35, rz: 0.14,  scale: 1.32, phase: 2.7 },
-      { x: 42,  y: 52,  z: 12,  rx: -0.36, ry: 0.35,  rz: -0.14, scale: 1.32, phase: 3.6 },
-      { x: 0,   y: 78,  z: -4,  rx: -0.55, ry: 0.04,  rz: 0.02,  scale: 1.28, phase: 4.5 },
+      { x: -38, y: 62,  z: 10,  rx: -0.36, ry: -0.30, rz: 0.12,  scale: 1.42, phase: 2.7 },
+      { x: 38,  y: 64,  z: 10,  rx: -0.36, ry: 0.30,  rz: -0.12, scale: 1.42, phase: 3.6 },
+      { x: 0,   y: 92,  z: -6,  rx: -0.52, ry: 0.0,   rz: 0.0,   scale: 1.38, phase: 4.5 },
 
-      { x: -62, y: 24,  z: -36, rx: -0.24, ry: -2.25, rz: 0.18,  scale: 1.34, phase: 5.4 },
-      { x: 62,  y: 26,  z: -36, rx: -0.24, ry: 2.25,  rz: -0.18, scale: 1.34, phase: 0.5 },
-      { x: 0,   y: 36,  z: -46, rx: -0.32, ry: 3.14,  rz: 0.0,   scale: 1.36, phase: 1.4 }
+      // Tył do pełnego obrotu
+      { x: -56, y: 32,  z: -36, rx: -0.24, ry: -2.2,  rz: 0.16,  scale: 1.45, phase: 5.4 },
+      { x: 56,  y: 34,  z: -36, rx: -0.24, ry: 2.2,   rz: -0.16, scale: 1.45, phase: 0.5 },
+      { x: 0,   y: 46,  z: -44, rx: -0.30, ry: 3.14,  rz: 0.0,   scale: 1.48, phase: 1.4 }
     ];
 
     const BUDS = [
-      { x: 26,  y: 98, z: -6,  tipX: 32,  tipY: 120, tipZ: -4,  phase: 0.4 },
-      { x: -30, y: 94, z: -10, tipX: -36, tipY: 114, tipZ: -8,  phase: 1.8 }
+      { x: 28,  y: 112, z: -6,  tipX: 34,  tipY: 132, tipZ: -4,  phase: 0.4 },
+      { x: -30, y: 108, z: -10, tipX: -36, tipY: 126, tipZ: -8,  phase: 1.8 }
     ];
 
-    const LEAVES = Array.from({ length: 12 }, (_, i) => {
-      const a = (i / 12) * Math.PI * 2;
-      const r = 22 + (i % 2) * 10;
+    const LEAVES = Array.from({ length: 10 }, (_, i) => {
+      const a = (i / 10) * Math.PI * 2;
+      const r = 20 + (i % 2) * 8;
       return {
         x: Math.cos(a) * r,
-        y: -32 + (i % 3) * 12,
+        y: -36 + (i % 2) * 12,
         z: Math.sin(a) * r,
         yaw: a,
-        len: 44 + (i % 2) * 10,
-        wid: 8 + (i % 2) * 2,
+        len: 38 + (i % 2) * 8,
+        wid: 7,
         phase: i * 0.6
       };
     });
@@ -129,13 +131,13 @@
         Math.hypot(p2.x - p1.x, p2.y - p1.y) > 0.25
       ) {
         const g = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
-        g.addColorStop(0.0, "#c7255c");
-        g.addColorStop(0.35, "#ff7aa8");
-        g.addColorStop(0.75, "#ffe0ec");
+        g.addColorStop(0.0, "#e63975");
+        g.addColorStop(0.45, "#ff8fb5");
+        g.addColorStop(0.85, "#ffe6f0");
         g.addColorStop(1.0, "#ffffff");
         return g;
       }
-      return "#ff8db4";
+      return "#ff9ec0";
     }
 
     function boostSaturation(r, g, b, sat) {
@@ -181,45 +183,31 @@
 
       const charAspect = cellH / cellW;
       const cx = cols * 0.5;
-      const cy = rows * 0.55;
-      const scale = Math.min((cols / charAspect) / 275, rows / 245);
+      const cy = rows * 0.56;
+      const scale = Math.min((cols / charAspect) / 280, rows / 255);
       const items = [];
 
-      // Prążkowany wazon u dołu
-      const vaseTopY = -44;
+      // Delikatniejszy, lżejszy wizualnie wazon u dołu
+      const vaseTopY = -48;
       const vaseBotY = -112;
-      const radTop = 34;
-      const radBot = 24;
-      const ribs = 20;
+      const radTop = 30;
+      const radBot = 22;
+      const ribs = 14;
 
       for (let i = 0; i < ribs; i++) {
         const a1 = (i / ribs) * Math.PI * 2;
-        const a2 = ((i + 0.55) / ribs) * Math.PI * 2;
-
         const t1 = project3D(Math.cos(a1) * radTop, vaseTopY, Math.sin(a1) * radTop, angleY, cx, cy, scale, charAspect);
-        const t2 = project3D(Math.cos(a2) * radTop, vaseTopY, Math.sin(a2) * radTop, angleY, cx, cy, scale, charAspect);
-        const b2 = project3D(Math.cos(a2) * radBot, vaseBotY, Math.sin(a2) * radBot, angleY, cx, cy, scale, charAspect);
         const b1 = project3D(Math.cos(a1) * radBot, vaseBotY, Math.sin(a1) * radBot, angleY, cx, cy, scale, charAspect);
 
-        if (!isFinitePt(t1) || !isFinitePt(t2) || !isFinitePt(b1) || !isFinitePt(b2)) continue;
-        const avgZ = (t1.z + t2.z + b1.z + b2.z) * 0.25;
+        if (!isFinitePt(t1) || !isFinitePt(b1)) continue;
+        const avgZ = (t1.z + b1.z) * 0.5;
         if (avgZ >= 0) continue;
 
         items.push({
           z: avgZ + 8,
           draw: () => {
-            const spec = Math.abs(Math.sin(a1 + angleY));
-            srcCtx.fillStyle = `rgba(145, 180, 168, ${0.20 + spec * 0.22})`;
-            srcCtx.beginPath();
-            srcCtx.moveTo(t1.x, t1.y);
-            srcCtx.lineTo(t2.x, t2.y);
-            srcCtx.lineTo(b2.x, b2.y);
-            srcCtx.lineTo(b1.x, b1.y);
-            srcCtx.closePath();
-            srcCtx.fill();
-
-            srcCtx.strokeStyle = `rgba(220, 245, 236, ${0.42 + spec * 0.45})`;
-            srcCtx.lineWidth = Math.max(1.0, 1.3 * t1.p);
+            srcCtx.strokeStyle = "rgba(130, 175, 158, 0.32)";
+            srcCtx.lineWidth = Math.max(0.9, 1.1 * t1.p);
             srcCtx.beginPath();
             srcCtx.moveTo(t1.x, t1.y);
             srcCtx.lineTo(b1.x, b1.y);
@@ -231,7 +219,7 @@
       // Łodygi
       FLOWERS.forEach((fl) => {
         const pTop = project3D(fl.x, fl.y - 4, fl.z, angleY, cx, cy, scale, charAspect);
-        const pMid = project3D(fl.x * 0.24, -26, fl.z * 0.24, angleY, cx, cy, scale, charAspect);
+        const pMid = project3D(fl.x * 0.22, -26, fl.z * 0.22, angleY, cx, cy, scale, charAspect);
         const pBot = project3D(fl.x * 0.14, -102, fl.z * 0.14, angleY, cx, cy, scale, charAspect);
         if (!isFinitePt(pTop) || !isFinitePt(pMid) || !isFinitePt(pBot)) return;
 
@@ -241,14 +229,14 @@
             srcCtx.beginPath();
             srcCtx.moveTo(pBot.x, pBot.y);
             srcCtx.quadraticCurveTo(pMid.x, pMid.y, pTop.x, pTop.y);
-            srcCtx.strokeStyle = "#36662f";
-            srcCtx.lineWidth = Math.max(1.2, 1.8 * pMid.p);
+            srcCtx.strokeStyle = "#2b5425";
+            srcCtx.lineWidth = Math.max(1.0, 1.5 * pMid.p);
             srcCtx.stroke();
           }
         });
       });
 
-      // Zielone liście
+      // Liście
       LEAVES.forEach((lf) => {
         const yaw = lf.yaw + Math.sin(time * 1.3 + lf.phase) * 0.03;
         const pBase = project3D(lf.x, lf.y, lf.z, angleY, cx, cy, scale, charAspect);
@@ -275,17 +263,16 @@
             srcCtx.quadraticCurveTo(pL.x, pL.y, pTip.x, pTip.y);
             srcCtx.quadraticCurveTo(pR.x, pR.y, pBase.x, pBase.y);
             srcCtx.closePath();
-
-            srcCtx.fillStyle = "#295222";
+            srcCtx.fillStyle = "#22451e";
             srcCtx.fill();
-            srcCtx.strokeStyle = "#427537";
-            srcCtx.lineWidth = Math.max(0.9, 1.1 * pBase.p);
+            srcCtx.strokeStyle = "#3a6b32";
+            srcCtx.lineWidth = Math.max(0.8, 1.0 * pBase.p);
             srcCtx.stroke();
           }
         });
       });
 
-      // Pąki u góry
+      // Pąki
       BUDS.forEach((bud) => {
         const sway = Math.sin(time * 1.3 + bud.phase) * 2.0;
         const pBase = project3D(bud.x, bud.y - 12, bud.z, angleY, cx, cy, scale, charAspect);
@@ -302,73 +289,50 @@
             srcCtx.quadraticCurveTo(pL.x, pL.y, pTip.x, pTip.y);
             srcCtx.quadraticCurveTo(pR.x, pR.y, pBase.x, pBase.y);
             srcCtx.closePath();
-            srcCtx.fillStyle = "#f9b5cc";
+            srcCtx.fillStyle = "#ffa8c6";
             srcCtx.fill();
             srcCtx.strokeStyle = "#5c0e29";
-            srcCtx.lineWidth = Math.max(1.0, 1.3 * pBase.p);
+            srcCtx.lineWidth = Math.max(1.0, 1.2 * pBase.p);
             srcCtx.stroke();
           }
         });
       });
 
-      // Kwiaty lilii z wyraźnym konturem każdego płatka (brzeg płatka + nerw środkowy + środek)
+      // Kwiaty lilii: 6 wyraźnych płatków w kształcie gwiazdy z jasnym wnętrzem i wyraźnym konturem
       FLOWERS.forEach((fl) => {
         const sway = Math.sin(time * 1.3 + fl.phase) * 0.025;
         const centerW = localToWorld(0, 0, 0, fl);
         const pCenter = project3D(centerW.x, centerW.y, centerW.z, angleY + sway, cx, cy, scale, charAspect);
         if (!isFinitePt(pCenter)) return;
 
-        items.push({
-          z: pCenter.z + 1.5,
-          draw: () => {
-            srcCtx.fillStyle = "#240611";
-            srcCtx.beginPath();
-            srcCtx.ellipse(
-              pCenter.x,
-              pCenter.y,
-              Math.max(2.5, 5.2 * pCenter.p * charAspect),
-              Math.max(2.0, 4.4 * pCenter.p),
-              0,
-              0,
-              Math.PI * 2
-            );
-            srcCtx.fill();
-            srcCtx.strokeStyle = "#ff9ec0";
-            srcCtx.lineWidth = Math.max(0.9, 1.2 * pCenter.p);
-            srcCtx.stroke();
-          }
-        });
-
         for (let p = 0; p < 6; p++) {
-          const theta = (p / 6) * Math.PI * 2 + (p % 2) * 0.08;
-          const len = p % 2 === 0 ? 34 : 31;
-          const wid = p % 2 === 0 ? 9.5 : 10.5;
-          const curl = -8.0;
+          const theta = (p / 6) * Math.PI * 2;
+          const len = p % 2 === 0 ? 33 : 30;
+          const wid = 9.0;
+          const curl = -7.0;
 
           const cosT = Math.cos(theta);
           const sinT = Math.sin(theta);
 
-          const wBase = localToWorld(cosT * 3.5, sinT * 3.5, 1, fl);
+          const wBase = localToWorld(cosT * 3.0, sinT * 3.0, 1, fl);
           const wMidL = localToWorld(
-            cosT * (len * 0.50) - sinT * wid,
-            sinT * (len * 0.50) + cosT * wid,
-            4.5,
+            cosT * (len * 0.48) - sinT * wid,
+            sinT * (len * 0.48) + cosT * wid,
+            4.0,
             fl
           );
           const wMidR = localToWorld(
-            cosT * (len * 0.50) + sinT * wid,
-            sinT * (len * 0.50) - cosT * wid,
-            4.5,
+            cosT * (len * 0.48) + sinT * wid,
+            sinT * (len * 0.48) - cosT * wid,
+            4.0,
             fl
           );
           const wTip = localToWorld(cosT * len, sinT * len, curl, fl);
-          const wStripe = localToWorld(cosT * (len * 0.72), sinT * (len * 0.72), -1.0, fl);
 
           const pBase = project3D(wBase.x, wBase.y, wBase.z, angleY + sway, cx, cy, scale, charAspect);
           const pMidL = project3D(wMidL.x, wMidL.y, wMidL.z, angleY + sway, cx, cy, scale, charAspect);
           const pMidR = project3D(wMidR.x, wMidR.y, wMidR.z, angleY + sway, cx, cy, scale, charAspect);
           const pTip = project3D(wTip.x, wTip.y, wTip.z, angleY + sway, cx, cy, scale, charAspect);
-          const pStripe = project3D(wStripe.x, wStripe.y, wStripe.z, angleY + sway, cx, cy, scale, charAspect);
 
           if (!isFinitePt(pBase) || !isFinitePt(pMidL) || !isFinitePt(pMidR) || !isFinitePt(pTip)) continue;
           const zAvg = (pBase.z + pMidL.z + pMidR.z + pTip.z) * 0.25;
@@ -385,55 +349,23 @@
               srcCtx.fillStyle = makePetalGrad(srcCtx, pBase, pTip);
               srcCtx.fill();
 
-              // Wyraźny ciemny kontur płatka odcinający kształt lilii na tle i innych płatkach
-              srcCtx.strokeStyle = "#47071e";
-              srcCtx.lineWidth = Math.max(1.4, 1.9 * pBase.p);
+              srcCtx.strokeStyle = "#4d0821";
+              srcCtx.lineWidth = Math.max(1.3, 1.8 * pBase.p);
               srcCtx.stroke();
-
-              // Środkowy nerw płatka
-              if (isFinitePt(pStripe)) {
-                srcCtx.beginPath();
-                srcCtx.moveTo(pBase.x, pBase.y);
-                srcCtx.lineTo(pStripe.x, pStripe.y);
-                srcCtx.strokeStyle = "#9e1243";
-                srcCtx.lineWidth = Math.max(1.0, 1.4 * pBase.p);
-                srcCtx.stroke();
-              }
             }
           });
         }
 
-        for (let st = 0; st < 6; st++) {
-          const a = (st / 6) * Math.PI * 2 + 0.3;
-          const wAnther = localToWorld(Math.cos(a) * 11, Math.sin(a) * 11, 15, fl);
-          const pAnther = project3D(wAnther.x, wAnther.y, wAnther.z, angleY + sway, cx, cy, scale, charAspect);
-          if (!isFinitePt(pAnther)) continue;
-
-          items.push({
-            z: pAnther.z - 2,
-            draw: () => {
-              srcCtx.beginPath();
-              srcCtx.moveTo(pCenter.x, pCenter.y);
-              srcCtx.lineTo(pAnther.x, pAnther.y);
-              srcCtx.strokeStyle = "#f2faad";
-              srcCtx.lineWidth = Math.max(1.0, 1.3 * pCenter.p);
-              srcCtx.stroke();
-
-              srcCtx.fillStyle = "#591414";
-              srcCtx.beginPath();
-              srcCtx.ellipse(
-                pAnther.x,
-                pAnther.y,
-                Math.max(1.8, 2.8 * pAnther.p * charAspect),
-                Math.max(1.1, 1.4 * pAnther.p),
-                a,
-                0,
-                Math.PI * 2
-              );
-              srcCtx.fill();
-            }
-          });
-        }
+        // Środek kwiatu i pręciki
+        items.push({
+          z: pCenter.z - 1.5,
+          draw: () => {
+            srcCtx.fillStyle = "#6e1133";
+            srcCtx.beginPath();
+            srcCtx.arc(pCenter.x, pCenter.y, Math.max(1.8, 3.0 * pCenter.p), 0, Math.PI * 2);
+            srcCtx.fill();
+          }
+        });
       });
 
       items.sort((a, b) => b.z - a.z);
@@ -446,9 +378,9 @@
       const vw = Math.max(300, window.innerWidth || document.documentElement.clientWidth || 800);
       const vh = Math.max(300, window.innerHeight || document.documentElement.clientHeight || 600);
 
-      const targetCols = Math.min(155, Math.max(95, Math.floor(vw / 7.5)));
-      const cellW = Math.max(4, Math.floor(vw / targetCols));
-      const cellH = Math.max(7, Math.round(cellW / 0.55));
+      const targetCols = Math.min(130, Math.max(85, Math.floor(vw / 8.5)));
+      const cellW = Math.max(5, Math.floor(vw / targetCols));
+      const cellH = Math.max(9, Math.round(cellW / 0.55));
       const cols = Math.floor(vw / cellW);
       const rows = Math.floor(vh / cellH);
 
@@ -483,15 +415,14 @@
       asciiCtx.font = `bold ${cellH}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
       asciiCtx.textBaseline = "top";
 
-      // Wyraźniejszy próg krawędzi Sobela, aby kontury płatków rysowały się znakami kierunkowymi
-      const edgeThresh = 0.8 - 0.6 * 0.68;
+      const edgeThresh = 0.8 - 0.6 * 0.65;
       const rampLen = RAMP.length;
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const idx = r * cols + c;
           const l = lum[idx];
-          if (l < 0.06) continue;
+          if (l < 0.08) continue;
 
           let glyph = RAMP[Math.min(rampLen - 1, Math.round(l * (rampLen - 1)))];
 
@@ -509,7 +440,7 @@
             const gy = -tl - 2 * tc - tr + bl + 2 * bc + br;
             const mag = Math.hypot(gx, gy) / 4.0;
 
-            if (mag > edgeThresh && l > 0.12) {
+            if (mag > edgeThresh && l > 0.14) {
               const ang = ((Math.atan2(gy, gx) * 180) / Math.PI + 90.0 + 360.0) % 180.0;
               glyph = EDGE_GLYPHS[Math.floor(((ang + 22.5) % 180.0) / 45.0)];
             }
@@ -530,7 +461,7 @@
         angleY += dt * 0.55;
         drawFrame();
       } catch (e) {
-        // Zapewnia ciągłość pętli nawet przy chwilowej nietypowej wartości
+        // Zapewnia ciągłość pętli
       }
       requestAnimationFrame(loop);
     }
