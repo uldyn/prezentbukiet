@@ -371,35 +371,40 @@
       }
     }
 
-    function drawAsciiCaption(cols, rows, cellW, cellH) {
+    function drawAsciiCaption(cols, rows, cellW, cellH, outW, outH) {
       const caption = "Pamiętaj że jesteś super";
-      const targetRow = Math.max(1, rows - 3);
-      const maxChars = Math.max(8, cols - 4);
-      const chars = Array.from(caption).slice(0, maxChars);
-      const startCol = Math.max(0, Math.floor((cols - chars.length) * 0.5));
+      const isMobile = outW < 640;
 
-      // Czyścimy pasek pod napisem, żeby znaki wazonu nie nachodziły na tekst
-      asciiCtx.fillStyle = "#040406";
-      asciiCtx.fillRect(0, (targetRow - 1) * cellH, cols * cellW, cellH * 2.5);
+      // Wyżej na ekranie i większy rozmiar na telefonie
+      const yPos = isMobile ? outH * 0.73 : (rows - 3) * cellH;
+      const fontPx = isMobile
+        ? Math.max(18, Math.min(30, Math.round(outW / 17.5)))
+        : Math.max(12, cellH);
 
       asciiCtx.save();
-      asciiCtx.font = `bold ${cellH}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
-      asciiCtx.textBaseline = "top";
-      asciiCtx.shadowColor = "rgba(168, 85, 247, 0.9)";
-      asciiCtx.shadowBlur = Math.max(10, cellH * 1.25);
+      asciiCtx.font = `bold ${fontPx}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
+      asciiCtx.textAlign = "center";
+      asciiCtx.textBaseline = "middle";
+      asciiCtx.shadowColor = "rgba(168, 85, 247, 0.95)";
+      asciiCtx.shadowBlur = isMobile ? 18 : Math.max(10, cellH * 1.25);
+
+      const totalW = asciiCtx.measureText(caption).width;
+      const chars = Array.from(caption);
+      let cursorX = outW * 0.5 - totalW * 0.5;
 
       for (let i = 0; i < chars.length; i++) {
         const ch = chars[i];
-        const c = startCol + i;
-        if (ch === " ") continue;
+        const w = asciiCtx.measureText(ch).width;
+        if (ch !== " ") {
+          const t = chars.length > 1 ? i / (chars.length - 1) : 0.5;
+          const rCol = Math.round(195 + 45 * Math.sin(t * Math.PI));
+          const gCol = Math.round(130 + 65 * Math.sin(t * Math.PI));
+          const bCol = 255;
 
-        const t = chars.length > 1 ? i / (chars.length - 1) : 0.5;
-        const rCol = Math.round(190 + 45 * Math.sin(t * Math.PI));
-        const gCol = Math.round(125 + 65 * Math.sin(t * Math.PI));
-        const bCol = 255;
-
-        asciiCtx.fillStyle = `rgb(${rCol},${gCol},${bCol})`;
-        asciiCtx.fillText(ch, c * cellW, targetRow * cellH);
+          asciiCtx.fillStyle = `rgb(${rCol},${gCol},${bCol})`;
+          asciiCtx.fillText(ch, cursorX + w * 0.5, yPos);
+        }
+        cursorX += w;
       }
 
       asciiCtx.restore();
@@ -482,7 +487,7 @@
         }
       }
 
-      drawAsciiCaption(cols, rows, cellW, cellH);
+      drawAsciiCaption(cols, rows, cellW, cellH, outW, outH);
     }
 
     let prev = performance.now();
