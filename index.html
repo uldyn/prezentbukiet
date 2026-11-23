@@ -129,7 +129,7 @@
         Math.hypot(p2.x - p1.x, p2.y - p1.y) > 0.25
       ) {
         const g = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
-        g.addColorStop(0.0, "#d4356c");
+        g.addColorStop(0.0, "#c7255c");
         g.addColorStop(0.35, "#ff7aa8");
         g.addColorStop(0.75, "#ffe0ec");
         g.addColorStop(1.0, "#ffffff");
@@ -304,11 +304,14 @@
             srcCtx.closePath();
             srcCtx.fillStyle = "#f9b5cc";
             srcCtx.fill();
+            srcCtx.strokeStyle = "#5c0e29";
+            srcCtx.lineWidth = Math.max(1.0, 1.3 * pBase.p);
+            srcCtx.stroke();
           }
         });
       });
 
-      // Wyraźne kwiaty lilii: 6 płatków z jasnym brzegiem, różowym środkiem i ciemnym obrysem
+      // Kwiaty lilii z wyraźnym konturem każdego płatka (brzeg płatka + nerw środkowy + środek)
       FLOWERS.forEach((fl) => {
         const sway = Math.sin(time * 1.3 + fl.phase) * 0.025;
         const centerW = localToWorld(0, 0, 0, fl);
@@ -318,7 +321,7 @@
         items.push({
           z: pCenter.z + 1.5,
           draw: () => {
-            srcCtx.fillStyle = "#2b0815";
+            srcCtx.fillStyle = "#240611";
             srcCtx.beginPath();
             srcCtx.ellipse(
               pCenter.x,
@@ -330,6 +333,9 @@
               Math.PI * 2
             );
             srcCtx.fill();
+            srcCtx.strokeStyle = "#ff9ec0";
+            srcCtx.lineWidth = Math.max(0.9, 1.2 * pCenter.p);
+            srcCtx.stroke();
           }
         });
 
@@ -379,16 +385,18 @@
               srcCtx.fillStyle = makePetalGrad(srcCtx, pBase, pTip);
               srcCtx.fill();
 
-              srcCtx.strokeStyle = "#590b26";
-              srcCtx.lineWidth = Math.max(1.1, 1.5 * pBase.p);
+              // Wyraźny ciemny kontur płatka odcinający kształt lilii na tle i innych płatkach
+              srcCtx.strokeStyle = "#47071e";
+              srcCtx.lineWidth = Math.max(1.4, 1.9 * pBase.p);
               srcCtx.stroke();
 
+              // Środkowy nerw płatka
               if (isFinitePt(pStripe)) {
                 srcCtx.beginPath();
                 srcCtx.moveTo(pBase.x, pBase.y);
                 srcCtx.lineTo(pStripe.x, pStripe.y);
-                srcCtx.strokeStyle = "#b5194f";
-                srcCtx.lineWidth = Math.max(1.1, 1.6 * pBase.p);
+                srcCtx.strokeStyle = "#9e1243";
+                srcCtx.lineWidth = Math.max(1.0, 1.4 * pBase.p);
                 srcCtx.stroke();
               }
             }
@@ -475,7 +483,8 @@
       asciiCtx.font = `bold ${cellH}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
       asciiCtx.textBaseline = "top";
 
-      const edgeThresh = 0.8 - 0.6 * 0.55;
+      // Wyraźniejszy próg krawędzi Sobela, aby kontury płatków rysowały się znakami kierunkowymi
+      const edgeThresh = 0.8 - 0.6 * 0.68;
       const rampLen = RAMP.length;
 
       for (let r = 0; r < rows; r++) {
