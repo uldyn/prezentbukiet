@@ -23,6 +23,8 @@
 
     #asciiCanvas {
       display: block;
+      max-width: 100%;
+      max-height: 100%;
     }
   </style>
 </head>
@@ -30,19 +32,21 @@
   <canvas id="asciiCanvas"></canvas>
 
   <script>
+    // ASCII luminance ramp ordered from sparse/dark to dense/bright glyphs
     const RAMP = " .:-=+*#%@";
     const EDGE_GLYPHS = ["-", "\\", "|", "/"];
 
     const asciiCanvas = document.getElementById("asciiCanvas");
     const asciiCtx = asciiCanvas.getContext("2d");
 
+    // Offscreen source buffer used to rasterize the 3D scene before ASCII mapping
     const srcCanvas = document.createElement("canvas");
     const srcCtx = srcCanvas.getContext("2d", { willReadFrequently: true });
 
     let angleY = 0.25;
     let time = 0;
 
-    // Rozłożyste kwiaty lilii w pełnym obrocie 360°
+    // 9 lily blooms arranged around the bouquet for a full 360-degree rotation
     const FLOWERS = [
       { x: -60, y: 18,  z: 30,  rx: -0.22, ry: -0.45, rz: 0.16,  scale: 1.68, phase: 0.0 },
       { x: 60,  y: 22,  z: 30,  rx: -0.22, ry: 0.45,  rz: -0.16, scale: 1.68, phase: 0.9 },
@@ -52,17 +56,19 @@
       { x: 36,  y: 66,  z: 8,   rx: -0.35, ry: 0.30,  rz: -0.12, scale: 1.54, phase: 3.6 },
       { x: 0,   y: 94,  z: -6,  rx: -0.50, ry: 0.0,   rz: 0.0,   scale: 1.48, phase: 4.5 },
 
-      // Tył bukietu (obrót 360°)
+      // Back blooms for complete 360-degree visibility
       { x: -46, y: 32,  z: -34, rx: -0.25, ry: -2.2,  rz: 0.14,  scale: 1.58, phase: 5.4 },
       { x: 46,  y: 34,  z: -34, rx: -0.25, ry: 2.2,   rz: -0.14, scale: 1.58, phase: 0.6 },
       { x: 0,   y: 42,  z: -40, rx: -0.28, ry: 3.14,  rz: 0.0,   scale: 1.60, phase: 1.5 }
     ];
 
+    // Closed buds perched near the top of the arrangement
     const BUDS = [
       { x: 24,  y: 114, z: -4, tipX: 30,  tipY: 132, tipZ: -2, phase: 0.4 },
       { x: -24, y: 110, z: -6, tipX: -30, tipY: 128, tipZ: -4, phase: 1.8 }
     ];
 
+    // Ring of curved green leaves around the lower stem base
     const LEAVES = Array.from({ length: 8 }, (_, i) => {
       const a = (i / 8) * Math.PI * 2;
       const r = 18;
@@ -81,6 +87,7 @@
       return pt && Number.isFinite(pt.x) && Number.isFinite(pt.y) && Number.isFinite(pt.z) && Number.isFinite(pt.p);
     }
 
+    // Projects a 3D point into character-grid space with Y rotation and gentle X tilt
     function project3D(x, y, z, rotY, cx, cy, scale, charAspect) {
       const cosY = Math.cos(rotY);
       const sinY = Math.sin(rotY);
@@ -104,6 +111,7 @@
       };
     }
 
+    // Transforms local flower coordinates into bouquet world space
     function localToWorld(lx, ly, lz, fl) {
       let x = lx * Math.cos(fl.rz) - ly * Math.sin(fl.rz);
       let y = lx * Math.sin(fl.rz) + ly * Math.cos(fl.rz);
@@ -124,6 +132,7 @@
       };
     }
 
+    // Creates a pink-to-white gradient from petal base to tip
     function makePetalGrad(ctx, p1, p2) {
       if (
         Number.isFinite(p1.x) && Number.isFinite(p1.y) &&
@@ -139,6 +148,7 @@
       return "#ffa3c2";
     }
 
+    // Boosts color saturation via HSV scaling so ASCII hues remain vivid
     function boostSaturation(r, g, b, sat) {
       const rn = r / 255, gn = g / 255, bn = b / 255;
       const max = Math.max(rn, gn, bn);
@@ -173,6 +183,7 @@
       return [Math.round(ro * 255), Math.round(go * 255), Math.round(bo * 255)];
     }
 
+    // Renders the depth-sorted 3D bouquet (striped vase, stems, leaves, buds, and lilies)
     function renderBouquet(cols, rows, cellW, cellH) {
       srcCanvas.width = cols;
       srcCanvas.height = rows;
@@ -186,7 +197,7 @@
       const scale = Math.min((cols / charAspect) / 260, rows / 240);
       const items = [];
 
-      // Prążkowany wazon u dołu
+      // Striped vase at the bottom
       const vaseTopY = -46;
       const vaseBotY = -110;
       const radTop = 28;
@@ -214,7 +225,7 @@
         });
       }
 
-      // Łodygi
+      // Stems connecting each flower to the vase
       FLOWERS.forEach((fl) => {
         const pTop = project3D(fl.x, fl.y - 2, fl.z, angleY, cx, cy, scale, charAspect);
         const pMid = project3D(fl.x * 0.2, -26, fl.z * 0.2, angleY, cx, cy, scale, charAspect);
@@ -234,7 +245,7 @@
         });
       });
 
-      // Liście
+      // Green leaves with subtle breeze sway
       LEAVES.forEach((lf) => {
         const yaw = lf.yaw + Math.sin(time * 1.3 + lf.phase) * 0.03;
         const pBase = project3D(lf.x, lf.y, lf.z, angleY, cx, cy, scale, charAspect);
@@ -270,7 +281,7 @@
         });
       });
 
-      // Pąki
+      // Upper flower buds
       BUDS.forEach((bud) => {
         const sway = Math.sin(time * 1.3 + bud.phase) * 2.0;
         const pBase = project3D(bud.x, bud.y - 10, bud.z, angleY, cx, cy, scale, charAspect);
@@ -296,7 +307,7 @@
         });
       });
 
-      // Kwiaty lilii: 6 smukłych płatków w kształcie gwiazdy z jasnym wnętrzem i wyraźnym konturem
+      // 6-petaled lilies with pink-to-white fill, dark pink outlines, and bright centers
       FLOWERS.forEach((fl) => {
         const sway = Math.sin(time * 1.3 + fl.phase) * 0.025;
         const centerW = localToWorld(0, 0, 0, fl);
@@ -365,28 +376,30 @@
         });
       });
 
+      // Painter's algorithm: draw farthest elements first
       items.sort((a, b) => b.z - a.z);
       for (let i = 0; i < items.length; i++) {
         items[i].draw();
       }
     }
 
+    // Draws the bottom caption with a purple glow, sized larger on desktop while keeping mobile intact
     function drawAsciiCaption(cols, rows, cellW, cellH, outW, outH) {
       const caption = "Pamiętaj że jesteś super";
       const isMobile = outW < 640;
 
-      // Niżej niż 0.73, żeby nie wchodziło w wazon, ale wyżej niż sam dół ekranu
-      const yPos = isMobile ? outH * 0.81 : (rows - 3) * cellH;
+      // Mobile keeps its calibrated vertical position and size; desktop scales up noticeably
+      const yPos = isMobile ? outH * 0.81 : Math.min(outH - cellH * 2.2, (rows - 2.6) * cellH);
       const fontPx = isMobile
         ? Math.max(18, Math.min(30, Math.round(outW / 17.5)))
-        : Math.max(12, cellH);
+        : Math.max(28, Math.min(54, Math.round(Math.min(outW / 24, cellH * 2.35))));
 
       asciiCtx.save();
       asciiCtx.font = `bold ${fontPx}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
       asciiCtx.textAlign = "center";
       asciiCtx.textBaseline = "middle";
-      asciiCtx.shadowColor = "rgba(168, 85, 247, 0.95)";
-      asciiCtx.shadowBlur = isMobile ? 18 : Math.max(10, cellH * 1.25);
+      asciiCtx.shadowColor = isMobile ? "rgba(168, 85, 247, 0.95)" : "rgba(168, 85, 247, 1)";
+      asciiCtx.shadowBlur = isMobile ? 18 : Math.max(22, fontPx * 0.72);
 
       const totalW = asciiCtx.measureText(caption).width;
       const chars = Array.from(caption);
@@ -410,6 +423,7 @@
       asciiCtx.restore();
     }
 
+    // Converts the rasterized bouquet buffer into colored ASCII + Sobel edge glyphs
     function drawFrame() {
       const vw = Math.max(300, window.innerWidth || document.documentElement.clientWidth || 800);
       const vh = Math.max(300, window.innerHeight || document.documentElement.clientHeight || 600);
@@ -462,6 +476,7 @@
 
           let glyph = RAMP[Math.min(rampLen - 1, Math.round(l * (rampLen - 1)))];
 
+          // Apply Sobel edge detection to highlight petal boundaries and contours
           if (r > 0 && r < rows - 1 && c > 0 && c < cols - 1) {
             const tl = lum[(r - 1) * cols + (c - 1)];
             const tc = lum[(r - 1) * cols + c];
@@ -499,7 +514,7 @@
         angleY += dt * 0.55;
         drawFrame();
       } catch (e) {
-        // Zapewnia ciągłość pętli
+        // Keep animation loop alive even on transient resize frames
       }
       requestAnimationFrame(loop);
     }
