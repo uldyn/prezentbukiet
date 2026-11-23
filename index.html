@@ -39,6 +39,9 @@
     const srcCanvas = document.createElement("canvas");
     const srcCtx = srcCanvas.getContext("2d", { willReadFrequently: true });
 
+    const textCanvas = document.createElement("canvas");
+    const textCtx = textCanvas.getContext("2d", { willReadFrequently: true });
+
     let angleY = 0.25;
     let time = 0;
 
@@ -371,6 +374,80 @@
       }
     }
 
+    function drawAsciiCaption(cols, rows, cellW, cellH, edgeThresh) {
+      const caption = "Pamiętaj że jesteś super";
+      const bandRows = Math.max(6, Math.min(12, Math.round(rows * 0.11)));
+      const startRow = Math.max(0, rows - bandRows - 2);
+
+      textCanvas.width = cols;
+      textCanvas.height = bandRows;
+      textCtx.clearRect(0, 0, cols, bandRows);
+
+      const fontSize = Math.max(5, Math.min(bandRows - 1, Math.floor((cols * 0.86) / (caption.length * 0.62))));
+      textCtx.font = `900 ${fontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
+      textCtx.textAlign = "center";
+      textCtx.textBaseline = "middle";
+      textCtx.fillStyle = "#ffffff";
+      textCtx.fillText(caption, cols * 0.5, bandRows * 0.52);
+
+      const tData = textCtx.getImageData(0, 0, cols, bandRows).data;
+      const tCount = cols * bandRows;
+      const tLum = new Float32Array(tCount);
+      const tR = new Uint8Array(tCount);
+      const tG = new Uint8Array(tCount);
+      const tB = new Uint8Array(tCount);
+
+      for (let i = 0; i < tCount; i++) {
+        const a = tData[i * 4 + 3] / 255.0;
+        if (a > 0.05) {
+          const r = Math.round(255 * (0.72 + 0.28 * a));
+          const g = Math.round(135 + 120 * a);
+          const b = Math.round(180 + 75 * a);
+          tR[i] = r;
+          tG[i] = g;
+          tB[i] = b;
+          tLum[i] = Math.min(1.0, a * 1.15);
+        }
+      }
+
+      const rampLen = RAMP.length;
+      for (let br = 0; br < bandRows; br++) {
+        const r = startRow + br;
+        if (r < 0 || r >= rows) continue;
+
+        for (let c = 0; c < cols; c++) {
+          const bIdx = br * cols + c;
+          const l = tLum[bIdx];
+          if (l < 0.12) continue;
+
+          let glyph = RAMP[Math.min(rampLen - 1, Math.max(2, Math.round(l * (rampLen - 1))))];
+
+          if (br > 0 && br < bandRows - 1 && c > 0 && c < cols - 1) {
+            const tl = tLum[(br - 1) * cols + (c - 1)];
+            const tc = tLum[(br - 1) * cols + c];
+            const tr = tLum[(br - 1) * cols + (c + 1)];
+            const ml = tLum[br * cols + (c - 1)];
+            const mr = tLum[br * cols + (c + 1)];
+            const bl = tLum[(br + 1) * cols + (c - 1)];
+            const bc = tLum[(br + 1) * cols + c];
+            const brLum = tLum[(br + 1) * cols + (c + 1)];
+
+            const gx = -tl + tr - 2 * ml + 2 * mr - bl + brLum;
+            const gy = -tl - 2 * tc - tr + bl + 2 * bc + brLum;
+            const mag = Math.hypot(gx, gy) / 4.0;
+
+            if (mag > edgeThresh * 0.75) {
+              const ang = ((Math.atan2(gy, gx) * 180) / Math.PI + 90.0 + 360.0) % 180.0;
+              glyph = EDGE_GLYPHS[Math.floor(((ang + 22.5) % 180.0) / 45.0)];
+            }
+          }
+
+          asciiCtx.fillStyle = `rgb(${tR[bIdx]},${tG[bIdx]},${tB[bIdx]})`;
+          asciiCtx.fillText(glyph, c * cellW, r * cellH);
+        }
+      }
+    }
+
     function drawFrame() {
       const vw = Math.max(300, window.innerWidth || document.documentElement.clientWidth || 800);
       const vh = Math.max(300, window.innerHeight || document.documentElement.clientHeight || 600);
@@ -447,6 +524,8 @@
           asciiCtx.fillText(glyph, c * cellW, r * cellH);
         }
       }
+
+      drawAsciiCaption(cols, rows, cellW, cellH, edgeThresh);
     }
 
     let prev = performance.now();
