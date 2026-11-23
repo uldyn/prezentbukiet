@@ -375,8 +375,8 @@
       const caption = "Pamiętaj że jesteś super";
       const isMobile = outW < 640;
 
-      // Wyżej na ekranie i większy rozmiar na telefonie
-      const yPos = isMobile ? outH * 0.73 : (rows - 3) * cellH;
+      // Niżej niż 0.73, żeby nie wchodziło w wazon, ale wyżej niż sam dół ekranu
+      const yPos = isMobile ? outH * 0.81 : (rows - 3) * cellH;
       const fontPx = isMobile
         ? Math.max(18, Math.min(30, Math.round(outW / 17.5)))
         : Math.max(12, cellH);
